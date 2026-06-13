@@ -1,0 +1,10 @@
+{
+  "name": "@lucid-micro/frontend",
+  "private": true,
+  "packageManager": "pnpm@11.5.1",
+  "scripts": {
+    "dev:admin": "pnpm --filter @lucid-micro/admin dev",
+    "build:admin": "pnpm --filter @lucid-micro/admin build",
+    "typecheck:admin": "pnpm --filter @lucid-micro/admin typecheck"
+  }
+}

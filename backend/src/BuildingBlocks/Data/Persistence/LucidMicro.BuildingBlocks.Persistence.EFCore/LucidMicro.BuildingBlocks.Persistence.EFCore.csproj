@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\LucidMicro.BuildingBlocks.Persistence.Abstractions\LucidMicro.BuildingBlocks.Persistence.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\Core\Domain\LucidMicro.BuildingBlocks.Domain.Core\LucidMicro.BuildingBlocks.Domain.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+  </ItemGroup>
+</Project>

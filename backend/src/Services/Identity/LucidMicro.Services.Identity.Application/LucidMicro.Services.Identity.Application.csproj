@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\LucidMicro.Services.Identity.Domain\LucidMicro.Services.Identity.Domain.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Core\Application\LucidMicro.BuildingBlocks.Application\LucidMicro.BuildingBlocks.Application.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Web\Auth\LucidMicro.BuildingBlocks.Auth.Abstractions\LucidMicro.BuildingBlocks.Auth.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Messaging\Outbox\LucidMicro.BuildingBlocks.Outbox.Abstractions\LucidMicro.BuildingBlocks.Outbox.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Data\Persistence\LucidMicro.BuildingBlocks.Persistence.Abstractions\LucidMicro.BuildingBlocks.Persistence.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\Contracts\LucidMicro.Contracts.Notification\LucidMicro.Contracts.Notification.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+  </ItemGroup>
+</Project>

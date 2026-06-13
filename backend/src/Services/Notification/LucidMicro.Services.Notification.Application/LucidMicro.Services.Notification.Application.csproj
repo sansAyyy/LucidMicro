@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\BuildingBlocks\Messaging\EventBus\LucidMicro.BuildingBlocks.EventBus.Abstractions\LucidMicro.BuildingBlocks.EventBus.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Messaging\Inbox\LucidMicro.BuildingBlocks.Inbox.Core\LucidMicro.BuildingBlocks.Inbox.Core.csproj" />
+    <ProjectReference Include="..\LucidMicro.Services.Notification.Domain\LucidMicro.Services.Notification.Domain.csproj" />
+    <ProjectReference Include="..\..\..\Contracts\LucidMicro.Contracts.Notification\LucidMicro.Contracts.Notification.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Core\Application\LucidMicro.BuildingBlocks.Application\LucidMicro.BuildingBlocks.Application.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Data\Persistence\LucidMicro.BuildingBlocks.Persistence.Abstractions\LucidMicro.BuildingBlocks.Persistence.Abstractions.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+  </ItemGroup>
+</Project>

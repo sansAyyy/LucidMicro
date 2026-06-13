@@ -1,0 +1,121 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/Contracts/">
+    <Project Path="src/Contracts/LucidMicro.Contracts.Notification/LucidMicro.Contracts.Notification.csproj" />
+  </Folder>
+  <Folder Name="/src/Gateway/">
+    <Project Path="src/Gateway/LucidMicro.Gateway/LucidMicro.Gateway.csproj" />
+  </Folder>
+  <Folder Name="/src/BuildingBlocks/" />
+  <Folder Name="/src/BuildingBlocks/Core/Application/">
+    <Project Path="src/BuildingBlocks/Core/Application/LucidMicro.BuildingBlocks.Application/LucidMicro.BuildingBlocks.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/BuildingBlocks/Web/AspNetCore/">
+    <Project Path="src/BuildingBlocks/Web/AspNetCore/LucidMicro.BuildingBlocks.AspNetCore.Core/LucidMicro.BuildingBlocks.AspNetCore.Core.csproj" />
+  </Folder>
+  <Folder Name="/src/BuildingBlocks/Web/Auth/">
+    <Project Path="src/BuildingBlocks/Web/Auth/LucidMicro.BuildingBlocks.Auth.Abstractions/LucidMicro.BuildingBlocks.Auth.Abstractions.csproj" />
+    <Project Path="src/BuildingBlocks/Web/Auth/LucidMicro.BuildingBlocks.Auth.AspNetCore/LucidMicro.BuildingBlocks.Auth.AspNetCore.csproj" />
+  </Folder>
+  <Folder Name="/src/BuildingBlocks/Data/Caching/">
+    <Project Path="src/BuildingBlocks/Data/Caching/LucidMicro.BuildingBlocks.Caching.Abstractions/LucidMicro.BuildingBlocks.Caching.Abstractions.csproj" />
+    <Project Path="src/BuildingBlocks/Data/Caching/LucidMicro.BuildingBlocks.Caching.Redis/LucidMicro.BuildingBlocks.Caching.Redis.csproj" />
+  </Folder>
+  <Folder Name="/src/BuildingBlocks/Web/Cors/">
+    <Project Path="src/BuildingBlocks/Web/Cors/LucidMicro.BuildingBlocks.Cors.AspNetCore/LucidMicro.BuildingBlocks.Cors.AspNetCore.csproj" />
+  </Folder>
+  <Folder Name="/src/BuildingBlocks/Core/Domain/">
+    <Project Path="src/BuildingBlocks/Core/Domain/LucidMicro.BuildingBlocks.Domain.Core/LucidMicro.BuildingBlocks.Domain.Core.csproj" />
+  </Folder>
+  <Folder Name="/src/BuildingBlocks/Data/DistributedLock/">
+    <Project Path="src/BuildingBlocks/Data/DistributedLock/LucidMicro.BuildingBlocks.DistributedLock.Abstractions/LucidMicro.BuildingBlocks.DistributedLock.Abstractions.csproj" />
+    <Project Path="src/BuildingBlocks/Data/DistributedLock/LucidMicro.BuildingBlocks.DistributedLock.Redis/LucidMicro.BuildingBlocks.DistributedLock.Redis.csproj" />
+  </Folder>
+  <Folder Name="/src/BuildingBlocks/Messaging/EventBus/">
+    <Project Path="src/BuildingBlocks/Messaging/EventBus/LucidMicro.BuildingBlocks.EventBus.Abstractions/LucidMicro.BuildingBlocks.EventBus.Abstractions.csproj" />
+    <Project Path="src/BuildingBlocks/Messaging/EventBus/LucidMicro.BuildingBlocks.EventBus.RabbitMQ/LucidMicro.BuildingBlocks.EventBus.RabbitMQ.csproj" />
+  </Folder>
+  <Folder Name="/src/BuildingBlocks/Operations/Logging/">
+    <Project Path="src/BuildingBlocks/Operations/Logging/LucidMicro.BuildingBlocks.Logging.Serilog/LucidMicro.BuildingBlocks.Logging.Serilog.csproj" />
+  </Folder>
+  <Folder Name="/src/BuildingBlocks/Operations/HealthChecks/">
+    <Project Path="src/BuildingBlocks/Operations/HealthChecks/LucidMicro.BuildingBlocks.HealthChecks.AspNetCore/LucidMicro.BuildingBlocks.HealthChecks.AspNetCore.csproj" />
+    <Project Path="src/BuildingBlocks/Operations/HealthChecks/LucidMicro.BuildingBlocks.HealthChecks.Consul/LucidMicro.BuildingBlocks.HealthChecks.Consul.csproj" />
+    <Project Path="src/BuildingBlocks/Operations/HealthChecks/LucidMicro.BuildingBlocks.HealthChecks.Npgsql/LucidMicro.BuildingBlocks.HealthChecks.Npgsql.csproj" />
+    <Project Path="src/BuildingBlocks/Operations/HealthChecks/LucidMicro.BuildingBlocks.HealthChecks.RabbitMQ/LucidMicro.BuildingBlocks.HealthChecks.RabbitMQ.csproj" />
+    <Project Path="src/BuildingBlocks/Operations/HealthChecks/LucidMicro.BuildingBlocks.HealthChecks.Redis/LucidMicro.BuildingBlocks.HealthChecks.Redis.csproj" />
+  </Folder>
+  <Folder Name="/src/BuildingBlocks/Communication/Http/">
+    <Project Path="src/BuildingBlocks/Communication/Http/LucidMicro.BuildingBlocks.Http.Core/LucidMicro.BuildingBlocks.Http.Core.csproj" />
+  </Folder>
+  <Folder Name="/src/BuildingBlocks/Messaging/Inbox/">
+    <Project Path="src/BuildingBlocks/Messaging/Inbox/LucidMicro.BuildingBlocks.Inbox.Abstractions/LucidMicro.BuildingBlocks.Inbox.Abstractions.csproj" />
+    <Project Path="src/BuildingBlocks/Messaging/Inbox/LucidMicro.BuildingBlocks.Inbox.Core/LucidMicro.BuildingBlocks.Inbox.Core.csproj" />
+    <Project Path="src/BuildingBlocks/Messaging/Inbox/LucidMicro.BuildingBlocks.Inbox.EFCore/LucidMicro.BuildingBlocks.Inbox.EFCore.csproj" />
+  </Folder>
+  <Folder Name="/src/BuildingBlocks/Operations/Observability/">
+    <Project Path="src/BuildingBlocks/Operations/Observability/LucidMicro.BuildingBlocks.Observability.OpenTelemetry/LucidMicro.BuildingBlocks.Observability.OpenTelemetry.csproj" />
+  </Folder>
+  <Folder Name="/src/BuildingBlocks/Web/OpenApi/">
+    <Project Path="src/BuildingBlocks/Web/OpenApi/LucidMicro.BuildingBlocks.OpenApi.AspNetCore/LucidMicro.BuildingBlocks.OpenApi.AspNetCore.csproj" />
+  </Folder>
+  <Folder Name="/src/BuildingBlocks/Web/RateLimiting/">
+    <Project Path="src/BuildingBlocks/Web/RateLimiting/LucidMicro.BuildingBlocks.RateLimiting.AspNetCore/LucidMicro.BuildingBlocks.RateLimiting.AspNetCore.csproj" />
+  </Folder>
+  <Folder Name="/src/BuildingBlocks/Communication/Resilience/">
+    <Project Path="src/BuildingBlocks/Communication/Resilience/LucidMicro.BuildingBlocks.Resilience.Http/LucidMicro.BuildingBlocks.Resilience.Http.csproj" />
+  </Folder>
+  <Folder Name="/src/BuildingBlocks/Communication/ServiceDiscovery/">
+    <Project Path="src/BuildingBlocks/Communication/ServiceDiscovery/LucidMicro.BuildingBlocks.ServiceDiscovery.Abstractions/LucidMicro.BuildingBlocks.ServiceDiscovery.Abstractions.csproj" />
+    <Project Path="src/BuildingBlocks/Communication/ServiceDiscovery/LucidMicro.BuildingBlocks.ServiceDiscovery.Consul/LucidMicro.BuildingBlocks.ServiceDiscovery.Consul.csproj" />
+    <Project Path="src/BuildingBlocks/Communication/ServiceDiscovery/LucidMicro.BuildingBlocks.ServiceDiscovery.Http/LucidMicro.BuildingBlocks.ServiceDiscovery.Http.csproj" />
+    <Project Path="src/BuildingBlocks/Communication/ServiceDiscovery/LucidMicro.BuildingBlocks.ServiceDiscovery.Static/LucidMicro.BuildingBlocks.ServiceDiscovery.Static.csproj" />
+  </Folder>
+  <Folder Name="/src/BuildingBlocks/Messaging/Outbox/">
+    <Project Path="src/BuildingBlocks/Messaging/Outbox/LucidMicro.BuildingBlocks.Outbox.Abstractions/LucidMicro.BuildingBlocks.Outbox.Abstractions.csproj" />
+    <Project Path="src/BuildingBlocks/Messaging/Outbox/LucidMicro.BuildingBlocks.Outbox.Core/LucidMicro.BuildingBlocks.Outbox.Core.csproj" />
+    <Project Path="src/BuildingBlocks/Messaging/Outbox/LucidMicro.BuildingBlocks.Outbox.EFCore/LucidMicro.BuildingBlocks.Outbox.EFCore.csproj" />
+  </Folder>
+  <Folder Name="/src/BuildingBlocks/Data/Persistence/">
+    <Project Path="src/BuildingBlocks/Data/Persistence/LucidMicro.BuildingBlocks.Persistence.Abstractions/LucidMicro.BuildingBlocks.Persistence.Abstractions.csproj" />
+    <Project Path="src/BuildingBlocks/Data/Persistence/LucidMicro.BuildingBlocks.Persistence.EFCore/LucidMicro.BuildingBlocks.Persistence.EFCore.csproj" />
+  </Folder>
+  <Folder Name="/src/Services/" />
+  <Folder Name="/src/Services/Identity/">
+    <Project Path="src/Services/Identity/LucidMicro.Services.Identity.Api/LucidMicro.Services.Identity.Api.csproj" />
+    <Project Path="src/Services/Identity/LucidMicro.Services.Identity.Application/LucidMicro.Services.Identity.Application.csproj" />
+    <Project Path="src/Services/Identity/LucidMicro.Services.Identity.Domain/LucidMicro.Services.Identity.Domain.csproj" />
+    <Project Path="src/Services/Identity/LucidMicro.Services.Identity.Infrastructure/LucidMicro.Services.Identity.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Services/Notification/">
+    <Project Path="src/Services/Notification/LucidMicro.Services.Notification.Api/LucidMicro.Services.Notification.Api.csproj" />
+    <Project Path="src/Services/Notification/LucidMicro.Services.Notification.Application/LucidMicro.Services.Notification.Application.csproj" />
+    <Project Path="src/Services/Notification/LucidMicro.Services.Notification.Domain/LucidMicro.Services.Notification.Domain.csproj" />
+    <Project Path="src/Services/Notification/LucidMicro.Services.Notification.Infrastructure/LucidMicro.Services.Notification.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/" />
+  <Folder Name="/tests/Contracts/">
+    <Project Path="tests/Contracts/LucidMicro.Contracts.Tests/LucidMicro.Contracts.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tests/BuildingBlocks/">
+    <Project Path="tests/BuildingBlocks/LucidMicro.BuildingBlocks.Tests/LucidMicro.BuildingBlocks.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tests/Shared/">
+    <Project Path="tests/Shared/LucidMicro.Tests.Shared/LucidMicro.Tests.Shared.csproj" />
+  </Folder>
+  <Folder Name="/tests/Services/" />
+  <Folder Name="/tests/Services/Architecture/">
+    <Project Path="tests/Services/LucidMicro.Services.Architecture.Tests/LucidMicro.Services.Architecture.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tests/Services/Identity/">
+    <Project Path="tests/Services/Identity/LucidMicro.Services.Identity.Api.Tests/LucidMicro.Services.Identity.Api.Tests.csproj" />
+    <Project Path="tests/Services/Identity/LucidMicro.Services.Identity.Application.Tests/LucidMicro.Services.Identity.Application.Tests.csproj" />
+    <Project Path="tests/Services/Identity/LucidMicro.Services.Identity.Domain.Tests/LucidMicro.Services.Identity.Domain.Tests.csproj" />
+    <Project Path="tests/Services/Identity/LucidMicro.Services.Identity.Infrastructure.Tests/LucidMicro.Services.Identity.Infrastructure.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tests/Services/Notification/">
+    <Project Path="tests/Services/Notification/LucidMicro.Services.Notification.Api.Tests/LucidMicro.Services.Notification.Api.Tests.csproj" />
+    <Project Path="tests/Services/Notification/LucidMicro.Services.Notification.Application.Tests/LucidMicro.Services.Notification.Application.Tests.csproj" />
+    <Project Path="tests/Services/Notification/LucidMicro.Services.Notification.Infrastructure.Tests/LucidMicro.Services.Notification.Infrastructure.Tests.csproj" />
+  </Folder>
+</Solution>

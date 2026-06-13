@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\BuildingBlocks\Operations\HealthChecks\LucidMicro.BuildingBlocks.HealthChecks.AspNetCore\LucidMicro.BuildingBlocks.HealthChecks.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Services\Notification\LucidMicro.Services.Notification.Domain\LucidMicro.Services.Notification.Domain.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Services\Notification\LucidMicro.Services.Notification.Infrastructure\LucidMicro.Services.Notification.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\Shared\LucidMicro.Tests.Shared\LucidMicro.Tests.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+</Project>

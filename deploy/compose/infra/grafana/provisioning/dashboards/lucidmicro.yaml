@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: LucidMicro
+    orgId: 1
+    folder: LucidMicro
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /etc/grafana/provisioning/dashboards/lucidmicro

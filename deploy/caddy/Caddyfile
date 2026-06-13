@@ -1,0 +1,14 @@
+{
+	email {$CADDY_ACME_EMAIL}
+	acme_dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+}
+
+cloud.example.xyz {
+	encode zstd gzip
+	reverse_proxy admin-web:80
+}
+
+api.example.xyz {
+	encode zstd gzip
+	reverse_proxy gateway:8080
+}

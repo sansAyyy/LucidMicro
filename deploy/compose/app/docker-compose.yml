@@ -1,0 +1,114 @@
+services:
+  notification-api:
+    image: lucidmicro/notification-api:local
+    build:
+      context: ../../..
+      dockerfile: deploy/docker/backend/Dockerfile
+      args:
+        PROJECT_PATH: backend/src/Services/Notification/LucidMicro.Services.Notification.Api/LucidMicro.Services.Notification.Api.csproj
+        APP_DLL: LucidMicro.Services.Notification.Api.dll
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__Notification: ${NOTIFICATION_CONNECTION_STRING}
+      Lucid__EventBus__RabbitMQ__ConnectionString: ${RABBITMQ_CONNECTION_STRING}
+      Lucid__ServiceDiscovery__Consul__Address: ${CONSUL_ADDRESS}
+      Lucid__ServiceDiscovery__Consul__Token: ${CONSUL_TOKEN}
+      Lucid__ServiceDiscovery__Consul__Registration__ServiceName: notification
+      Lucid__ServiceDiscovery__Consul__Registration__UseInstanceDefaults: "true"
+      Lucid__ServiceDiscovery__Consul__Registration__Port: "8080"
+      Lucid__Logging__Serilog__Loki__Enabled: ${LOKI_ENABLED:-false}
+      Lucid__Logging__Serilog__Loki__Uri: ${LOKI_URI:-http://loki:3100}
+      Lucid__Observability__OpenTelemetry__OtlpEndpoint: ${OTEL_OTLP_ENDPOINT:-http://otel-collector:4317}
+      Authentication__Jwt__Issuer: ${JWT_ISSUER}
+      Authentication__Jwt__Audience: ${JWT_AUDIENCE}
+      Authentication__Jwt__RefreshAudience: ${JWT_REFRESH_AUDIENCE}
+      Authentication__Jwt__SigningKey: ${JWT_SIGNING_KEY}
+    networks:
+      - lucid-app
+
+  identity-api:
+    image: lucidmicro/identity-api:local
+    build:
+      context: ../../..
+      dockerfile: deploy/docker/backend/Dockerfile
+      args:
+        PROJECT_PATH: backend/src/Services/Identity/LucidMicro.Services.Identity.Api/LucidMicro.Services.Identity.Api.csproj
+        APP_DLL: LucidMicro.Services.Identity.Api.dll
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__Identity: ${IDENTITY_CONNECTION_STRING}
+      Lucid__Caching__Redis__ConnectionString: ${REDIS_CONNECTION_STRING}
+      Lucid__EventBus__RabbitMQ__ConnectionString: ${RABBITMQ_CONNECTION_STRING}
+      Lucid__ServiceDiscovery__Consul__Address: ${CONSUL_ADDRESS}
+      Lucid__ServiceDiscovery__Consul__Token: ${CONSUL_TOKEN}
+      Lucid__ServiceDiscovery__Consul__Registration__ServiceName: identity
+      Lucid__ServiceDiscovery__Consul__Registration__UseInstanceDefaults: "true"
+      Lucid__ServiceDiscovery__Consul__Registration__Port: "8080"
+      Lucid__Logging__Serilog__Loki__Enabled: ${LOKI_ENABLED:-false}
+      Lucid__Logging__Serilog__Loki__Uri: ${LOKI_URI:-http://loki:3100}
+      Lucid__Observability__OpenTelemetry__OtlpEndpoint: ${OTEL_OTLP_ENDPOINT:-http://otel-collector:4317}
+      Authentication__Jwt__Issuer: ${JWT_ISSUER}
+      Authentication__Jwt__Audience: ${JWT_AUDIENCE}
+      Authentication__Jwt__RefreshAudience: ${JWT_REFRESH_AUDIENCE}
+      Authentication__Jwt__SigningKey: ${JWT_SIGNING_KEY}
+    depends_on:
+      - notification-api
+    networks:
+      - lucid-app
+
+  gateway:
+    image: lucidmicro/gateway:local
+    build:
+      context: ../../..
+      dockerfile: deploy/docker/backend/Dockerfile
+      args:
+        PROJECT_PATH: backend/src/Gateway/LucidMicro.Gateway/LucidMicro.Gateway.csproj
+        APP_DLL: LucidMicro.Gateway.dll
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      Lucid__Gateway__ServiceDiscovery__Enabled: "true"
+      Lucid__Gateway__ServiceDiscovery__RefreshIntervalSeconds: "10"
+      Lucid__Gateway__ServiceDiscovery__LoadBalancingPolicy: RoundRobin
+      Lucid__Gateway__ServiceDiscovery__Clusters__identity: identity
+      Lucid__Gateway__ServiceDiscovery__Clusters__notification: notification
+      Lucid__ServiceDiscovery__Consul__Address: ${CONSUL_ADDRESS}
+      Lucid__ServiceDiscovery__Consul__Token: ${CONSUL_TOKEN}
+      Lucid__Logging__Serilog__Loki__Enabled: ${LOKI_ENABLED:-false}
+      Lucid__Logging__Serilog__Loki__Uri: ${LOKI_URI:-http://loki:3100}
+      Lucid__Observability__OpenTelemetry__OtlpEndpoint: ${OTEL_OTLP_ENDPOINT:-http://otel-collector:4317}
+      ReverseProxy__Clusters__identity__Destinations__destination1__Address: http://identity-api:8080/
+      ReverseProxy__Clusters__notification__Destinations__destination1__Address: http://notification-api:8080/
+      Lucid__Cors__AllowedOrigins__0: ${ADMIN_ORIGIN}
+      Lucid__Cors__AllowedOrigins__1: ${LOCAL_ADMIN_ORIGIN:-http://localhost:5173}
+      Lucid__Cors__AllowedOrigins__2: ${LOCAL_ADMIN_ORIGIN_127:-http://127.0.0.1:5173}
+      Lucid__Cors__AllowedOrigins__3: ${LOCAL_ADMIN_ORIGIN_ALT:-http://localhost:5174}
+      Lucid__Cors__AllowedOrigins__4: ${LOCAL_ADMIN_ORIGIN_ALT_127:-http://127.0.0.1:5174}
+    ports:
+      - "${GATEWAY_BIND:-127.0.0.1}:${GATEWAY_PORT}:8080"
+    depends_on:
+      - identity-api
+      - notification-api
+    networks:
+      - lucid-app
+
+  admin-web:
+    image: lucidmicro/admin-web:local
+    build:
+      context: ../../..
+      dockerfile: deploy/docker/admin/Dockerfile
+      args:
+        VITE_API_BASE_URL: ${GATEWAY_PUBLIC_URL}
+    ports:
+      - "${ADMIN_BIND:-127.0.0.1}:${ADMIN_PORT}:80"
+    depends_on:
+      - gateway
+    networks:
+      - lucid-app
+
+networks:
+  lucid-app:
+    external: true
+    name: lucid-app

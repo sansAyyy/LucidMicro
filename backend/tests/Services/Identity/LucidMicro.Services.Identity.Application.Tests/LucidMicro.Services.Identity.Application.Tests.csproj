@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\BuildingBlocks\Web\Auth\LucidMicro.BuildingBlocks.Auth.Abstractions\LucidMicro.BuildingBlocks.Auth.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\..\src\BuildingBlocks\Messaging\EventBus\LucidMicro.BuildingBlocks.EventBus.Abstractions\LucidMicro.BuildingBlocks.EventBus.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\..\src\BuildingBlocks\Messaging\Outbox\LucidMicro.BuildingBlocks.Outbox.Abstractions\LucidMicro.BuildingBlocks.Outbox.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\..\src\BuildingBlocks\Data\Persistence\LucidMicro.BuildingBlocks.Persistence.Abstractions\LucidMicro.BuildingBlocks.Persistence.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Contracts\LucidMicro.Contracts.Notification\LucidMicro.Contracts.Notification.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Services\Identity\LucidMicro.Services.Identity.Application\LucidMicro.Services.Identity.Application.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Services\Identity\LucidMicro.Services.Identity.Domain\LucidMicro.Services.Identity.Domain.csproj" />
+    <ProjectReference Include="..\..\..\Shared\LucidMicro.Tests.Shared\LucidMicro.Tests.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\EventBus\LucidMicro.BuildingBlocks.EventBus.Abstractions\LucidMicro.BuildingBlocks.EventBus.Abstractions.csproj" />
+  </ItemGroup>
+</Project>

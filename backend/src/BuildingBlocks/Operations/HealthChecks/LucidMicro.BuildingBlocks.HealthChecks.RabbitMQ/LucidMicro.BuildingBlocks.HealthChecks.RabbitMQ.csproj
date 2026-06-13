@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\LucidMicro.BuildingBlocks.HealthChecks.AspNetCore\LucidMicro.BuildingBlocks.HealthChecks.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\..\Messaging\EventBus\LucidMicro.BuildingBlocks.EventBus.RabbitMQ\LucidMicro.BuildingBlocks.EventBus.RabbitMQ.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" />
+    <PackageReference Include="RabbitMQ.Client" />
+  </ItemGroup>
+</Project>

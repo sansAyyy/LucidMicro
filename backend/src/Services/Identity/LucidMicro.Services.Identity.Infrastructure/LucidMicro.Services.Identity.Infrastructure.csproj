@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\LucidMicro.Services.Identity.Application\LucidMicro.Services.Identity.Application.csproj" />
+    <ProjectReference Include="..\LucidMicro.Services.Identity.Domain\LucidMicro.Services.Identity.Domain.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Web\Auth\LucidMicro.BuildingBlocks.Auth.AspNetCore\LucidMicro.BuildingBlocks.Auth.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Data\Caching\LucidMicro.BuildingBlocks.Caching.Abstractions\LucidMicro.BuildingBlocks.Caching.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Data\Caching\LucidMicro.BuildingBlocks.Caching.Redis\LucidMicro.BuildingBlocks.Caching.Redis.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Messaging\EventBus\LucidMicro.BuildingBlocks.EventBus.RabbitMQ\LucidMicro.BuildingBlocks.EventBus.RabbitMQ.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Operations\HealthChecks\LucidMicro.BuildingBlocks.HealthChecks.Npgsql\LucidMicro.BuildingBlocks.HealthChecks.Npgsql.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Operations\HealthChecks\LucidMicro.BuildingBlocks.HealthChecks.RabbitMQ\LucidMicro.BuildingBlocks.HealthChecks.RabbitMQ.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Operations\HealthChecks\LucidMicro.BuildingBlocks.HealthChecks.Consul\LucidMicro.BuildingBlocks.HealthChecks.Consul.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Communication\Http\LucidMicro.BuildingBlocks.Http.Core\LucidMicro.BuildingBlocks.Http.Core.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Messaging\Outbox\LucidMicro.BuildingBlocks.Outbox.Core\LucidMicro.BuildingBlocks.Outbox.Core.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Messaging\Outbox\LucidMicro.BuildingBlocks.Outbox.EFCore\LucidMicro.BuildingBlocks.Outbox.EFCore.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Data\Persistence\LucidMicro.BuildingBlocks.Persistence.EFCore\LucidMicro.BuildingBlocks.Persistence.EFCore.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Communication\Resilience\LucidMicro.BuildingBlocks.Resilience.Http\LucidMicro.BuildingBlocks.Resilience.Http.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Communication\ServiceDiscovery\LucidMicro.BuildingBlocks.ServiceDiscovery.Http\LucidMicro.BuildingBlocks.ServiceDiscovery.Http.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Communication\ServiceDiscovery\LucidMicro.BuildingBlocks.ServiceDiscovery.Consul\LucidMicro.BuildingBlocks.ServiceDiscovery.Consul.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Http" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+  </ItemGroup>
+</Project>

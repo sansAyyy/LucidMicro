@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\Contracts\LucidMicro.Contracts.Notification\LucidMicro.Contracts.Notification.csproj" />
+    <ProjectReference Include="..\..\..\..\src\BuildingBlocks\Messaging\Inbox\LucidMicro.BuildingBlocks.Inbox.Core\LucidMicro.BuildingBlocks.Inbox.Core.csproj" />
+    <ProjectReference Include="..\..\..\..\src\BuildingBlocks\Data\Persistence\LucidMicro.BuildingBlocks.Persistence.Abstractions\LucidMicro.BuildingBlocks.Persistence.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Services\Notification\LucidMicro.Services.Notification.Application\LucidMicro.Services.Notification.Application.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Services\Notification\LucidMicro.Services.Notification.Domain\LucidMicro.Services.Notification.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+</Project>

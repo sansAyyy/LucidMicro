@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\LucidMicro.Services.Notification.Application\LucidMicro.Services.Notification.Application.csproj" />
+    <ProjectReference Include="..\LucidMicro.Services.Notification.Domain\LucidMicro.Services.Notification.Domain.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Messaging\EventBus\LucidMicro.BuildingBlocks.EventBus.RabbitMQ\LucidMicro.BuildingBlocks.EventBus.RabbitMQ.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Communication\ServiceDiscovery\LucidMicro.BuildingBlocks.ServiceDiscovery.Consul\LucidMicro.BuildingBlocks.ServiceDiscovery.Consul.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Operations\HealthChecks\LucidMicro.BuildingBlocks.HealthChecks.Consul\LucidMicro.BuildingBlocks.HealthChecks.Consul.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Operations\HealthChecks\LucidMicro.BuildingBlocks.HealthChecks.Npgsql\LucidMicro.BuildingBlocks.HealthChecks.Npgsql.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Operations\HealthChecks\LucidMicro.BuildingBlocks.HealthChecks.RabbitMQ\LucidMicro.BuildingBlocks.HealthChecks.RabbitMQ.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Messaging\Inbox\LucidMicro.BuildingBlocks.Inbox.EFCore\LucidMicro.BuildingBlocks.Inbox.EFCore.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Data\Persistence\LucidMicro.BuildingBlocks.Persistence.EFCore\LucidMicro.BuildingBlocks.Persistence.EFCore.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Web\Auth\LucidMicro.BuildingBlocks.Auth.AspNetCore\LucidMicro.BuildingBlocks.Auth.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\..\Contracts\LucidMicro.Contracts.Notification\LucidMicro.Contracts.Notification.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Configuration" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+  </ItemGroup>
+</Project>

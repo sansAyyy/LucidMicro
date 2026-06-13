@@ -1,0 +1,6 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Core\Domain\LucidMicro.BuildingBlocks.Domain.Core\LucidMicro.BuildingBlocks.Domain.Core.csproj" />
+  </ItemGroup>
+</Project>

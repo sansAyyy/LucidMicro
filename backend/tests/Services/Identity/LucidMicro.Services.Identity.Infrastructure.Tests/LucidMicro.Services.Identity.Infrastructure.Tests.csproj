@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\BuildingBlocks\Operations\HealthChecks\LucidMicro.BuildingBlocks.HealthChecks.AspNetCore\LucidMicro.BuildingBlocks.HealthChecks.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\..\..\src\BuildingBlocks\Messaging\Outbox\LucidMicro.BuildingBlocks.Outbox.Abstractions\LucidMicro.BuildingBlocks.Outbox.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\..\src\BuildingBlocks\Messaging\Outbox\LucidMicro.BuildingBlocks.Outbox.EFCore\LucidMicro.BuildingBlocks.Outbox.EFCore.csproj" />
+    <ProjectReference Include="..\..\..\..\src\BuildingBlocks\Data\Persistence\LucidMicro.BuildingBlocks.Persistence.Abstractions\LucidMicro.BuildingBlocks.Persistence.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\..\src\BuildingBlocks\Data\Persistence\LucidMicro.BuildingBlocks.Persistence.EFCore\LucidMicro.BuildingBlocks.Persistence.EFCore.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Services\Identity\LucidMicro.Services.Identity.Domain\LucidMicro.Services.Identity.Domain.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Services\Identity\LucidMicro.Services.Identity.Infrastructure\LucidMicro.Services.Identity.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\Shared\LucidMicro.Tests.Shared\LucidMicro.Tests.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+</Project>

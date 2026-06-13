@@ -1,0 +1,56 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\BuildingBlocks\Core\Application\LucidMicro.BuildingBlocks.Application\LucidMicro.BuildingBlocks.Application.csproj" />
+    <ProjectReference Include="..\..\..\src\BuildingBlocks\Web\AspNetCore\LucidMicro.BuildingBlocks.AspNetCore.Core\LucidMicro.BuildingBlocks.AspNetCore.Core.csproj" />
+    <ProjectReference Include="..\..\..\src\BuildingBlocks\Web\Auth\LucidMicro.BuildingBlocks.Auth.Abstractions\LucidMicro.BuildingBlocks.Auth.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\src\BuildingBlocks\Web\Auth\LucidMicro.BuildingBlocks.Auth.AspNetCore\LucidMicro.BuildingBlocks.Auth.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\..\src\BuildingBlocks\Data\Caching\LucidMicro.BuildingBlocks.Caching.Redis\LucidMicro.BuildingBlocks.Caching.Redis.csproj" />
+    <ProjectReference Include="..\..\..\src\BuildingBlocks\Web\Cors\LucidMicro.BuildingBlocks.Cors.AspNetCore\LucidMicro.BuildingBlocks.Cors.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\..\src\BuildingBlocks\Core\Domain\LucidMicro.BuildingBlocks.Domain.Core\LucidMicro.BuildingBlocks.Domain.Core.csproj" />
+    <ProjectReference Include="..\..\..\src\BuildingBlocks\Data\DistributedLock\LucidMicro.BuildingBlocks.DistributedLock.Redis\LucidMicro.BuildingBlocks.DistributedLock.Redis.csproj" />
+    <ProjectReference Include="..\..\..\src\BuildingBlocks\Messaging\EventBus\LucidMicro.BuildingBlocks.EventBus.RabbitMQ\LucidMicro.BuildingBlocks.EventBus.RabbitMQ.csproj" />
+    <ProjectReference Include="..\..\..\src\BuildingBlocks\Operations\HealthChecks\LucidMicro.BuildingBlocks.HealthChecks.AspNetCore\LucidMicro.BuildingBlocks.HealthChecks.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\..\src\BuildingBlocks\Operations\HealthChecks\LucidMicro.BuildingBlocks.HealthChecks.Consul\LucidMicro.BuildingBlocks.HealthChecks.Consul.csproj" />
+    <ProjectReference Include="..\..\..\src\BuildingBlocks\Operations\HealthChecks\LucidMicro.BuildingBlocks.HealthChecks.Npgsql\LucidMicro.BuildingBlocks.HealthChecks.Npgsql.csproj" />
+    <ProjectReference Include="..\..\..\src\BuildingBlocks\Operations\HealthChecks\LucidMicro.BuildingBlocks.HealthChecks.RabbitMQ\LucidMicro.BuildingBlocks.HealthChecks.RabbitMQ.csproj" />
+    <ProjectReference Include="..\..\..\src\BuildingBlocks\Operations\HealthChecks\LucidMicro.BuildingBlocks.HealthChecks.Redis\LucidMicro.BuildingBlocks.HealthChecks.Redis.csproj" />
+    <ProjectReference Include="..\..\..\src\BuildingBlocks\Communication\Http\LucidMicro.BuildingBlocks.Http.Core\LucidMicro.BuildingBlocks.Http.Core.csproj" />
+    <ProjectReference Include="..\..\..\src\BuildingBlocks\Messaging\Inbox\LucidMicro.BuildingBlocks.Inbox.Abstractions\LucidMicro.BuildingBlocks.Inbox.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\src\BuildingBlocks\Messaging\Inbox\LucidMicro.BuildingBlocks.Inbox.Core\LucidMicro.BuildingBlocks.Inbox.Core.csproj" />
+    <ProjectReference Include="..\..\..\src\BuildingBlocks\Messaging\Inbox\LucidMicro.BuildingBlocks.Inbox.EFCore\LucidMicro.BuildingBlocks.Inbox.EFCore.csproj" />
+    <ProjectReference Include="..\..\..\src\BuildingBlocks\Operations\Logging\LucidMicro.BuildingBlocks.Logging.Serilog\LucidMicro.BuildingBlocks.Logging.Serilog.csproj" />
+    <ProjectReference Include="..\..\..\src\BuildingBlocks\Messaging\Outbox\LucidMicro.BuildingBlocks.Outbox.Abstractions\LucidMicro.BuildingBlocks.Outbox.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\src\BuildingBlocks\Messaging\Outbox\LucidMicro.BuildingBlocks.Outbox.Core\LucidMicro.BuildingBlocks.Outbox.Core.csproj" />
+    <ProjectReference Include="..\..\..\src\BuildingBlocks\Messaging\Outbox\LucidMicro.BuildingBlocks.Outbox.EFCore\LucidMicro.BuildingBlocks.Outbox.EFCore.csproj" />
+    <ProjectReference Include="..\..\..\src\BuildingBlocks\Data\Persistence\LucidMicro.BuildingBlocks.Persistence.Abstractions\LucidMicro.BuildingBlocks.Persistence.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\src\BuildingBlocks\Data\Persistence\LucidMicro.BuildingBlocks.Persistence.EFCore\LucidMicro.BuildingBlocks.Persistence.EFCore.csproj" />
+    <ProjectReference Include="..\..\..\src\BuildingBlocks\Operations\Observability\LucidMicro.BuildingBlocks.Observability.OpenTelemetry\LucidMicro.BuildingBlocks.Observability.OpenTelemetry.csproj" />
+    <ProjectReference Include="..\..\..\src\BuildingBlocks\Web\RateLimiting\LucidMicro.BuildingBlocks.RateLimiting.AspNetCore\LucidMicro.BuildingBlocks.RateLimiting.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\..\src\BuildingBlocks\Communication\Resilience\LucidMicro.BuildingBlocks.Resilience.Http\LucidMicro.BuildingBlocks.Resilience.Http.csproj" />
+    <ProjectReference Include="..\..\..\src\BuildingBlocks\Communication\ServiceDiscovery\LucidMicro.BuildingBlocks.ServiceDiscovery.Abstractions\LucidMicro.BuildingBlocks.ServiceDiscovery.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\src\BuildingBlocks\Communication\ServiceDiscovery\LucidMicro.BuildingBlocks.ServiceDiscovery.Consul\LucidMicro.BuildingBlocks.ServiceDiscovery.Consul.csproj" />
+    <ProjectReference Include="..\..\..\src\BuildingBlocks\Communication\ServiceDiscovery\LucidMicro.BuildingBlocks.ServiceDiscovery.Http\LucidMicro.BuildingBlocks.ServiceDiscovery.Http.csproj" />
+    <ProjectReference Include="..\..\..\src\BuildingBlocks\Communication\ServiceDiscovery\LucidMicro.BuildingBlocks.ServiceDiscovery.Static\LucidMicro.BuildingBlocks.ServiceDiscovery.Static.csproj" />
+    <ProjectReference Include="..\..\Shared\LucidMicro.Tests.Shared\LucidMicro.Tests.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+</Project>

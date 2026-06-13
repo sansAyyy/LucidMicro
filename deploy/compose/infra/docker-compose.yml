@@ -1,0 +1,184 @@
+services:
+  consul:
+    image: ${CONSUL_IMAGE}
+    command:
+      - consul
+      - agent
+      - -server
+      - -ui
+      - -node=consul-server
+      - -bootstrap-expect=1
+      - -client=0.0.0.0
+      - -data-dir=/consul/data
+      - -config-file=/consul/config/consul.hcl
+    restart: unless-stopped
+    ports:
+      - "${CONSUL_HTTP_BIND}:${CONSUL_HTTP_PORT}:8500"
+    volumes:
+      - consul-data:/consul/data
+      - ./consul:/consul/config
+    healthcheck:
+      test: ["CMD-SHELL", "consul members >/dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 15s
+    networks:
+      - lucid-app
+
+  postgres:
+    image: ${POSTGRES_IMAGE}
+    restart: unless-stopped
+    ports:
+      - "${POSTGRES_BIND}:${POSTGRES_PORT}:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql
+      - ./postgres/initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 15s
+    networks:
+      - lucid-app
+
+  redis:
+    image: ${REDIS_IMAGE}
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --requirepass
+      - ${REDIS_PASSWORD}
+    restart: unless-stopped
+    ports:
+      - "${REDIS_BIND}:${REDIS_PORT}:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "REDISCLI_AUTH=\"$${REDIS_PASSWORD}\" redis-cli ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 10s
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    networks:
+      - lucid-app
+
+  rabbitmq:
+    image: ${RABBITMQ_IMAGE}
+    hostname: rabbitmq
+    restart: unless-stopped
+    ports:
+      - "${RABBITMQ_AMQP_BIND}:${RABBITMQ_AMQP_PORT}:5672"
+      - "${RABBITMQ_MANAGEMENT_BIND}:${RABBITMQ_MANAGEMENT_PORT}:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+      RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_DEFAULT_VHOST}
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-diagnostics -q ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 20s
+    networks:
+      - lucid-app
+
+  loki:
+    image: ${LOKI_IMAGE}
+    command:
+      - -config.file=/etc/loki/loki-config.yaml
+    restart: unless-stopped
+    ports:
+      - "${LOKI_HTTP_BIND}:${LOKI_HTTP_PORT}:3100"
+    volumes:
+      - loki-data:/loki
+      - ./loki/loki-config.yaml:/etc/loki/loki-config.yaml:ro
+    networks:
+      - lucid-app
+
+  tempo:
+    image: ${TEMPO_IMAGE}
+    command:
+      - -config.file=/etc/tempo/tempo.yaml
+    restart: unless-stopped
+    ports:
+      - "${TEMPO_HTTP_BIND}:${TEMPO_HTTP_PORT}:3200"
+    volumes:
+      - tempo-data:/var/tempo
+      - ./tempo/tempo.yaml:/etc/tempo/tempo.yaml:ro
+    networks:
+      - lucid-app
+
+  otel-collector:
+    image: ${OTEL_COLLECTOR_IMAGE}
+    command:
+      - --config=/etc/otel-collector/otel-collector.yaml
+    restart: unless-stopped
+    ports:
+      - "${OTEL_COLLECTOR_OTLP_GRPC_BIND}:${OTEL_COLLECTOR_OTLP_GRPC_PORT}:4317"
+      - "${OTEL_COLLECTOR_OTLP_HTTP_BIND}:${OTEL_COLLECTOR_OTLP_HTTP_PORT}:4318"
+    volumes:
+      - ./otel-collector/otel-collector.yaml:/etc/otel-collector/otel-collector.yaml:ro
+    depends_on:
+      - tempo
+    networks:
+      - lucid-app
+
+  prometheus:
+    image: ${PROMETHEUS_IMAGE}
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+    restart: unless-stopped
+    ports:
+      - "${PROMETHEUS_HTTP_BIND}:${PROMETHEUS_HTTP_PORT}:9090"
+    volumes:
+      - prometheus-data:/prometheus
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    depends_on:
+      - otel-collector
+    networks:
+      - lucid-app
+
+  grafana:
+    image: ${GRAFANA_IMAGE}
+    restart: unless-stopped
+    ports:
+      - "${GRAFANA_HTTP_BIND}:${GRAFANA_HTTP_PORT}:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD}
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    depends_on:
+      - loki
+      - tempo
+      - prometheus
+    networks:
+      - lucid-app
+
+volumes:
+  consul-data:
+  postgres-data:
+  redis-data:
+  rabbitmq-data:
+  loki-data:
+  tempo-data:
+  prometheus-data:
+  grafana-data:
+
+networks:
+  lucid-app:
+    external: true
+    name: lucid-app
