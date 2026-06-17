@@ -36,7 +36,20 @@ jobs:
 
       - name: Test backend
         working-directory: backend
-        run: dotnet test LucidMicro.slnx --configuration Release --no-restore
+        run: >
+          dotnet test LucidMicro.slnx
+          --configuration Release
+          --no-restore
+          --logger "trx"
+          --results-directory TestResults
+
+      - name: Upload backend test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-results
+          path: backend/TestResults/**/*.trx
+          if-no-files-found: ignore
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
