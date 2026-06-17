@@ -3,7 +3,13 @@ import { computed, ref } from 'vue';
 
 import { HttpError, http } from '@/shared/api/http';
 import type { AdminPermission } from './permissions';
-import { clearTokens, getStoredTokens, saveTokens } from './token';
+import {
+  notifyTokensRefreshed,
+  registerRefreshSessionHandler,
+  registerSessionExpiredHandler,
+  registerTokensRefreshedHandler,
+} from './session';
+import { clearTokens, getStoredTokens, saveTokens, type AuthTokens } from './token';
 
 interface LoginRequest {
   loginName: string;
@@ -41,6 +47,10 @@ export const useAuthStore = defineStore('auth', () => {
   const displayName = computed(() => currentUser.value?.displayName ?? currentUser.value?.userName ?? 'Admin');
   const permissions = computed(() => new Set(currentUser.value?.permissions ?? []));
 
+  registerRefreshSessionHandler(refreshSession);
+  registerTokensRefreshedHandler(handleTokensRefreshed);
+  registerSessionExpiredHandler(handleSessionExpired);
+
   async function login(request: LoginRequest) {
     const response = await http<LoginResponse>('/api/identity/admin-auth/login', {
       method: 'POST',
@@ -54,14 +64,15 @@ export const useAuthStore = defineStore('auth', () => {
     await loadCurrentUser();
   }
 
-  async function refreshSession() {
+  async function refreshSession(): Promise<AuthTokens | null> {
     if (!refreshToken.value) {
-      return false;
+      return null;
     }
 
     try {
       const response = await http<LoginResponse>('/api/identity/admin-auth/refresh', {
         method: 'POST',
+        retryOnUnauthorized: false,
         body: {
           refreshToken: refreshToken.value,
         },
@@ -70,10 +81,11 @@ export const useAuthStore = defineStore('auth', () => {
       saveTokens(response);
       accessToken.value = response.accessToken;
       refreshToken.value = response.refreshToken;
-      return true;
+      notifyTokensRefreshed(response);
+      return response;
     } catch {
       clearSession();
-      return false;
+      return null;
     }
   }
 
@@ -136,6 +148,18 @@ export const useAuthStore = defineStore('auth', () => {
     currentUserRequest = null;
     sessionRequest = null;
     clearTokens();
+  }
+
+  function handleTokensRefreshed(tokens: AuthTokens) {
+    saveTokens(tokens);
+    accessToken.value = tokens.accessToken;
+    refreshToken.value = tokens.refreshToken;
+    hasLoadedCurrentUser.value = false;
+    loadCurrentUser().catch(() => {});
+  }
+
+  function handleSessionExpired() {
+    clearSession();
   }
 
   function hasPermission(permission: AdminPermission | string) {

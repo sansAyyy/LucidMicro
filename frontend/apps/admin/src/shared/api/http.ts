@@ -1,5 +1,6 @@
-import { apiBaseUrl } from './env';
+import { notifySessionExpired, refreshAuthSession } from '@/shared/auth/session';
 import { getAccessToken } from '@/shared/auth/token';
+import { apiBaseUrl } from './env';
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 export type HttpQuery = Record<string, boolean | number | string | null | undefined>;
@@ -9,6 +10,7 @@ export interface HttpRequestOptions extends Omit<RequestInit, 'body' | 'method'>
   body?: unknown;
   method?: HttpMethod;
   query?: HttpQuery;
+  retryOnUnauthorized?: boolean;
   token?: string | null;
 }
 
@@ -51,6 +53,23 @@ function getTraceId(details: unknown) {
 }
 
 export async function http<T>(path: string, options: HttpRequestOptions = {}): Promise<T> {
+  const shouldRetryUnauthorized = options.retryOnUnauthorized ?? options.auth === true;
+  const response = await sendRequest(path, options);
+
+  if (response.status === 401 && shouldRetryUnauthorized) {
+    const tokens = await refreshAuthSession();
+
+    if (tokens) {
+      return parseResponse<T>(await sendRequest(path, { ...options, retryOnUnauthorized: false, token: tokens.accessToken }));
+    }
+
+    notifySessionExpired();
+  }
+
+  return parseResponse<T>(response);
+}
+
+async function sendRequest(path: string, options: HttpRequestOptions) {
   const headers = new Headers(options.headers);
   const url = new URL(`${apiBaseUrl}${path}`, window.location.origin);
 
@@ -71,13 +90,15 @@ export async function http<T>(path: string, options: HttpRequestOptions = {}): P
     headers.set('Authorization', `Bearer ${token}`);
   }
 
-  const response = await fetch(url.toString(), {
+  return fetch(url.toString(), {
     ...options,
     method: options.method ?? 'GET',
     headers,
     body: options.body === undefined ? undefined : JSON.stringify(options.body),
   });
+}
 
+async function parseResponse<T>(response: Response): Promise<T> {
   if (response.status === 204) {
     return undefined as T;
   }

@@ -3,6 +3,7 @@ import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 
 import AdminLayout from '@/layouts/AdminLayout.vue';
 import AuthLayout from '@/layouts/AuthLayout.vue';
+import { registerSessionExpiredHandler } from '@/shared/auth/session';
 import { AdminPermissions } from '@/shared/auth/permissions';
 import { useAuthStore } from '@/shared/auth/useAuthStore';
 import './navigation';
@@ -115,6 +116,21 @@ router.onError((error, to) => {
   if (to && to.name !== 'login') {
     router.replace({ name: 'dashboard' }).catch(() => {});
   }
+});
+
+registerSessionExpiredHandler(() => {
+  const currentRoute = router.currentRoute.value;
+
+  if (currentRoute.meta.public) {
+    return;
+  }
+
+  router.replace({
+    name: 'login',
+    query: {
+      redirect: currentRoute.fullPath,
+    },
+  }).catch(() => {});
 });
 
 router.beforeEach(async (to) => {
