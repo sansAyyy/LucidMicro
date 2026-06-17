@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { SwitchButton } from '@element-plus/icons-vue';
-import { computed } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 import { buildNavigation, isNavigationGroup } from '@/app/navigation';
@@ -9,9 +9,36 @@ import { useAuthStore } from '@/shared/auth/useAuthStore';
 const router = useRouter();
 const route = useRoute();
 const auth = useAuthStore();
+const pendingMenuPath = ref<string | null>(null);
 
 const displayName = computed(() => auth.displayName);
 const navigation = computed(() => buildNavigation(router, auth.hasPermissions));
+const activeMenuPath = computed(() => pendingMenuPath.value ?? route.path);
+
+watch(
+  () => route.path,
+  () => {
+    pendingMenuPath.value = null;
+  },
+);
+
+async function selectNavigation(path: string) {
+  if (path === route.path) {
+    pendingMenuPath.value = null;
+    return;
+  }
+
+  pendingMenuPath.value = path;
+
+  try {
+    const failure = await router.push(path);
+    if (failure) {
+      pendingMenuPath.value = null;
+    }
+  } catch {
+    pendingMenuPath.value = null;
+  }
+}
 
 function logout() {
   auth.clearSession();
@@ -27,7 +54,7 @@ function logout() {
         <span class="brand-name">LucidMicro</span>
       </div>
 
-      <ElMenu class="main-nav" :default-active="route.path" router>
+      <ElMenu class="main-nav" :default-active="activeMenuPath" @select="selectNavigation">
         <template v-for="entry in navigation" :key="isNavigationGroup(entry) ? entry.key : entry.path">
           <ElSubMenu v-if="isNavigationGroup(entry)" :index="entry.key">
             <template #title>

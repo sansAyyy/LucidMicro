@@ -34,6 +34,8 @@ export const useAuthStore = defineStore('auth', () => {
   const refreshToken = ref(storedTokens?.refreshToken ?? null);
   const currentUser = ref<CurrentAdminUser | null>(null);
   const hasLoadedCurrentUser = ref(false);
+  let currentUserRequest: Promise<CurrentAdminUser | null> | null = null;
+  let sessionRequest: Promise<boolean> | null = null;
 
   const isAuthenticated = computed(() => Boolean(accessToken.value));
   const displayName = computed(() => currentUser.value?.displayName ?? currentUser.value?.userName ?? 'Admin');
@@ -75,25 +77,32 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  async function loadCurrentUser() {
+  async function loadCurrentUser(): Promise<CurrentAdminUser | null> {
     if (!accessToken.value) {
       return null;
     }
 
-    try {
-      currentUser.value = await http<CurrentAdminUser>('/api/identity/admin-auth/me', {
-        token: accessToken.value,
-      });
-      hasLoadedCurrentUser.value = true;
-      return currentUser.value;
-    } catch (error) {
-      if (error instanceof HttpError && error.status === 401 && (await refreshSession())) {
-        return loadCurrentUser();
-      }
+    currentUserRequest ??= (async (): Promise<CurrentAdminUser | null> => {
+      try {
+        currentUser.value = await http<CurrentAdminUser>('/api/identity/admin-auth/me', {
+          token: accessToken.value,
+        });
+        hasLoadedCurrentUser.value = true;
+        return currentUser.value;
+      } catch (error) {
+        if (error instanceof HttpError && error.status === 401 && (await refreshSession())) {
+          currentUserRequest = null;
+          return loadCurrentUser();
+        }
 
-      clearSession();
-      throw error;
-    }
+        clearSession();
+        throw error;
+      } finally {
+        currentUserRequest = null;
+      }
+    })();
+
+    return currentUserRequest;
   }
 
   async function ensureSession() {
@@ -105,12 +114,18 @@ export const useAuthStore = defineStore('auth', () => {
       return true;
     }
 
-    try {
-      await loadCurrentUser();
-      return true;
-    } catch {
-      return false;
-    }
+    sessionRequest ??= (async () => {
+      try {
+        await loadCurrentUser();
+        return true;
+      } catch {
+        return false;
+      } finally {
+        sessionRequest = null;
+      }
+    })();
+
+    return sessionRequest;
   }
 
   function clearSession() {
@@ -118,6 +133,8 @@ export const useAuthStore = defineStore('auth', () => {
     refreshToken.value = null;
     currentUser.value = null;
     hasLoadedCurrentUser.value = false;
+    currentUserRequest = null;
+    sessionRequest = null;
     clearTokens();
   }
 
