@@ -9,6 +9,7 @@ using LucidMicro.BuildingBlocks.HealthChecks.Npgsql.DependencyInjection;
 using LucidMicro.BuildingBlocks.HealthChecks.RabbitMQ.DependencyInjection;
 using LucidMicro.BuildingBlocks.Outbox.Core.DependencyInjection;
 using LucidMicro.BuildingBlocks.Outbox.EFCore.DependencyInjection;
+using LucidMicro.BuildingBlocks.Persistence.Abstractions.Conflicts;
 using LucidMicro.BuildingBlocks.Persistence.EFCore.DependencyInjection;
 using LucidMicro.BuildingBlocks.Resilience.Http.DependencyInjection;
 using LucidMicro.BuildingBlocks.Resilience.Http.Options;
@@ -61,6 +62,7 @@ public static class ServiceCollectionExtensions
             options => options.UseNpgsql(connectionString));
         services.AddLucidEfCoreOutbox<IdentityDbContext>();
         services.AddLucidNpgsqlDbContextHealthCheck<IdentityDbContext>();
+        services.AddScoped<IPersistenceConflictTranslator, IdentityPersistenceConflictTranslator>();
         services.AddScoped<IReadOnlyAdminUserPermissionRepository, ReadOnlyAdminUserPermissionRepository>();
         services.AddScoped<IReadOnlyAdminUserRoleRepository, AdminUserRoleRepository>();
         services.AddScoped<IAdminUserRoleRepository, AdminUserRoleRepository>();

@@ -1,6 +1,8 @@
 using LucidMicro.BuildingBlocks.Persistence.Abstractions.Auditing;
+using LucidMicro.BuildingBlocks.Persistence.Abstractions.Conflicts;
 using LucidMicro.BuildingBlocks.Persistence.Abstractions.Contracts;
 using LucidMicro.BuildingBlocks.Persistence.EFCore.Auditing;
+using LucidMicro.BuildingBlocks.Persistence.EFCore.Conflicts;
 using LucidMicro.BuildingBlocks.Persistence.EFCore.Interceptors;
 using LucidMicro.BuildingBlocks.Persistence.EFCore.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -31,6 +33,7 @@ public static class ServiceCollectionExtensions
 
         services.TryAddSingleton(TimeProvider.System);
         services.TryAddScoped<IAuditUserProvider, DefaultAuditUserProvider>();
+        services.TryAddScoped<IPersistenceConflictDetector, EfCorePersistenceConflictDetector>();
         services.AddScoped<AuditSaveChangesInterceptor>();
 
         services.AddDbContext<TDbContext>((serviceProvider, options) =>
@@ -40,7 +43,7 @@ public static class ServiceCollectionExtensions
         });
 
         services.AddScoped<DbContext>(serviceProvider => serviceProvider.GetRequiredService<TDbContext>());
-        services.AddScoped<IUnitOfWork>(serviceProvider => serviceProvider.GetRequiredService<TDbContext>());
+        services.AddScoped<IUnitOfWork, EfCoreUnitOfWork<TDbContext>>();
         services.AddScoped(typeof(IReadOnlyRepository<,>), typeof(EfReadOnlyRepository<,>));
         services.AddScoped(typeof(IRepository<,>), typeof(EfRepository<,>));
 

@@ -1,4 +1,7 @@
+using LucidMicro.BuildingBlocks.Application.Exceptions;
+using LucidMicro.BuildingBlocks.Application.Results;
 using LucidMicro.BuildingBlocks.Domain.Core.Entities;
+using LucidMicro.BuildingBlocks.Persistence.Abstractions.Conflicts;
 using LucidMicro.BuildingBlocks.Persistence.Abstractions.Contracts;
 using LucidMicro.BuildingBlocks.Persistence.EFCore.Conventions;
 using LucidMicro.BuildingBlocks.Persistence.EFCore.DbContexts;
@@ -6,6 +9,7 @@ using LucidMicro.BuildingBlocks.Persistence.EFCore.DependencyInjection;
 using LucidMicro.BuildingBlocks.Persistence.EFCore.Interceptors;
 using LucidMicro.Tests.Shared.Persistence;
 using LucidMicro.Tests.Shared.Time;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.DependencyInjection;
@@ -141,6 +145,52 @@ public sealed class EfCoreConventionsTests
         Assert.NotNull(repository);
     }
 
+    [Fact]
+    public void AddLucidEfCorePersistence_RegistersTranslatedUnitOfWork()
+    {
+        var services = new ServiceCollection();
+        services.AddLucidEfCorePersistence<TestDbContext>(
+            options => options.UseSqlite("Data Source=:memory:"));
+
+        using var serviceProvider = services.BuildServiceProvider();
+
+        var unitOfWork = serviceProvider.GetRequiredService<IUnitOfWork>();
+        var conflictDetector = serviceProvider.GetRequiredService<IPersistenceConflictDetector>();
+
+        Assert.NotNull(unitOfWork);
+        Assert.NotNull(conflictDetector);
+        Assert.NotEqual(typeof(TestDbContext), unitOfWork.GetType());
+    }
+
+    [Fact]
+    public async Task UnitOfWork_TranslatesUniqueConstraintConflicts()
+    {
+        await using var connection = new SqliteConnection("Data Source=:memory:");
+        await connection.OpenAsync();
+
+        var services = new ServiceCollection();
+        services.AddLucidEfCorePersistence<TestDbContext>(
+            options => options.UseSqlite(connection));
+        services.AddSingleton<IPersistenceConflictTranslator, TestPersistenceConflictTranslator>();
+
+        await using var serviceProvider = services.BuildServiceProvider();
+        await using var scope = serviceProvider.CreateAsyncScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<TestDbContext>();
+        await dbContext.Database.EnsureCreatedAsync();
+
+        dbContext.TestEntities.AddRange(
+            new TestEntity(Guid.NewGuid(), "duplicate"),
+            new TestEntity(Guid.NewGuid(), "duplicate"));
+
+        var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+
+        var exception = await Assert.ThrowsAsync<BusinessException>(
+            () => unitOfWork.SaveChangesAsync());
+
+        Assert.Equal("Test.UniqueConflict", exception.Error.Code);
+        Assert.Equal(ErrorType.Conflict, exception.Error.Type);
+    }
+
     private static string? GetColumnName(
         IEntityType entityType,
         string propertyName,
@@ -194,6 +244,21 @@ public sealed class EfCoreConventionsTests
         public void Rename(string name)
         {
             Name = name;
+        }
+    }
+
+    private sealed class TestPersistenceConflictTranslator : IPersistenceConflictTranslator
+    {
+        public bool TryTranslate(PersistenceConflict conflict, out Error error)
+        {
+            if (conflict.Type == PersistenceConflictType.UniqueConstraint)
+            {
+                error = Error.Conflict("Test.UniqueConflict", "Duplicate test entity.");
+                return true;
+            }
+
+            error = Error.None;
+            return false;
         }
     }
 
