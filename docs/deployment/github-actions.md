@@ -48,8 +48,10 @@ ghcr.io/<owner>/lucidmicro/admin-web
 
 ```text
 DEPLOY_HOST
+DEPLOY_PORT
 DEPLOY_USER
 DEPLOY_SSH_KEY
+DEPLOY_SSH_PASSPHRASE
 DEPLOY_PATH
 GATEWAY_PUBLIC_URL
 ```
@@ -57,11 +59,13 @@ GATEWAY_PUBLIC_URL
 含义：
 
 ```text
-DEPLOY_HOST        服务器 IP 或域名
-DEPLOY_USER        SSH 用户
-DEPLOY_SSH_KEY     可登录服务器的私钥
-DEPLOY_PATH        服务器上的 LucidMicro 部署目录，例如 /opt/lucidmicro
-GATEWAY_PUBLIC_URL 浏览器访问 Gateway 的公开地址，例如 https://api.example.xyz
+DEPLOY_HOST           服务器 IP 或域名
+DEPLOY_PORT           SSH 端口，可选，默认 22
+DEPLOY_USER           SSH 用户，推荐 deploy
+DEPLOY_SSH_KEY        可登录服务器的私钥完整内容
+DEPLOY_SSH_PASSPHRASE 私钥密码，可选；无密码私钥不需要配置
+DEPLOY_PATH           服务器上的 LucidMicro 部署目录，例如 /opt/lucidmicro
+GATEWAY_PUBLIC_URL    浏览器访问 Gateway 的公开地址，例如 https://api.example.xyz
 ```
 
 如果 GHCR package 是私有的，服务器拉镜像还需要：
@@ -83,11 +87,105 @@ docker compose
 git
 ```
 
-部署目录示例：
+### 创建部署用户
+
+推荐使用专用 `deploy` 用户，不使用个人账号或 `root` 直接部署。
+
+在服务器上使用有 sudo 权限的用户执行：
+
+```bash
+sudo adduser deploy
+sudo usermod -aG docker deploy
+```
+
+创建部署目录并授权给 `deploy`：
 
 ```bash
 sudo mkdir -p /opt/lucidmicro
-sudo chown "$USER":"$USER" /opt/lucidmicro
+sudo chown -R deploy:deploy /opt/lucidmicro
+```
+
+重新登录 `deploy` 用户后验证 Docker 权限：
+
+```bash
+su - deploy
+docker ps
+```
+
+如果 `docker ps` 提示权限不足，退出后重新 SSH 登录一次。用户加入 `docker` 组需要新登录会话才会生效。
+
+### 生成部署 SSH Key
+
+在本机生成一把专用于 GitHub Actions 的 SSH key：
+
+```bash
+ssh-keygen -t ed25519 -C "lucidmicro-github-actions" -f ./lucidmicro_deploy_key
+```
+
+会生成：
+
+```text
+lucidmicro_deploy_key      私钥，写入 GitHub Secret DEPLOY_SSH_KEY
+lucidmicro_deploy_key.pub  公钥，写入服务器 deploy 用户的 authorized_keys
+```
+
+把公钥添加到服务器：
+
+```bash
+ssh-copy-id -i ./lucidmicro_deploy_key.pub deploy@<server-ip>
+```
+
+如果服务器 SSH 端口不是 22：
+
+```bash
+ssh-copy-id -i ./lucidmicro_deploy_key.pub -p <ssh-port> deploy@<server-ip>
+```
+
+没有 `ssh-copy-id` 时，可以手动追加：
+
+```bash
+cat ./lucidmicro_deploy_key.pub | ssh deploy@<server-ip> 'mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys && chmod 700 ~/.ssh && chmod 600 ~/.ssh/authorized_keys'
+```
+
+如果 SSH 端口不是 22：
+
+```bash
+cat ./lucidmicro_deploy_key.pub | ssh -p <ssh-port> deploy@<server-ip> 'mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys && chmod 700 ~/.ssh && chmod 600 ~/.ssh/authorized_keys'
+```
+
+本机验证登录：
+
+```bash
+ssh -i ./lucidmicro_deploy_key deploy@<server-ip>
+```
+
+如果 SSH 端口不是 22：
+
+```bash
+ssh -i ./lucidmicro_deploy_key -p <ssh-port> deploy@<server-ip>
+```
+
+验证成功后，把私钥完整内容写入 GitHub Secret `DEPLOY_SSH_KEY`：
+
+```text
+-----BEGIN OPENSSH PRIVATE KEY-----
+...
+-----END OPENSSH PRIVATE KEY-----
+```
+
+不要把 `.pub` 公钥内容填到 `DEPLOY_SSH_KEY`。`.pub` 内容通常以 `ssh-ed25519` 开头，只放在服务器 `authorized_keys` 中。
+
+如果生成 key 时设置了 passphrase，需要额外配置 GitHub Secret：
+
+```text
+DEPLOY_SSH_PASSPHRASE
+```
+
+无 passphrase 的部署 key 可以不配置该 Secret。
+
+部署目录示例：
+
+```bash
 git clone https://github.com/<owner>/<repo>.git /opt/lucidmicro
 cd /opt/lucidmicro
 ```
