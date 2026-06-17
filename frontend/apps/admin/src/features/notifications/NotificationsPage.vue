@@ -142,7 +142,7 @@ onMounted(loadNotifications);
 
     <ElAlert v-if="errorMessage" :closable="false" show-icon type="error" :title="errorMessage" />
 
-    <ElCard shadow="never">
+    <ElCard class="data-table-card" shadow="never">
       <ElTable v-loading="isLoading" :data="tableData" row-key="id">
         <ElTableColumn prop="recipient" label="收件人" min-width="180" show-overflow-tooltip />
         <ElTableColumn label="渠道" width="110">

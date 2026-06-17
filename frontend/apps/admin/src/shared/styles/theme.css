@@ -92,7 +92,8 @@
 .admin-shell {
   display: grid;
   grid-template-columns: 240px minmax(0, 1fr);
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .admin-sidebar {
@@ -158,6 +159,7 @@
 .admin-main {
   display: grid;
   grid-template-rows: auto 1fr;
+  min-height: 0;
   min-width: 0;
 }
 
@@ -203,13 +205,18 @@
 }
 
 .content {
+  min-height: 0;
   min-width: 0;
+  overflow: hidden;
   padding: 28px;
 }
 
 .page-stack {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 20px;
+  height: 100%;
+  min-height: 0;
 }
 
 .page-header {
@@ -315,8 +322,58 @@
 
 .table-footer {
   display: flex;
+  flex-shrink: 0;
   justify-content: flex-end;
   padding-top: 18px;
+}
+
+.data-table-card {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.data-table-card > .el-card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+}
+
+.data-table-card .el-table {
+  flex: 1 1 auto;
+  height: 100%;
+  min-height: 0;
+}
+
+.data-table-card .el-table__inner-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+}
+
+.data-table-card .el-table__header-wrapper {
+  flex-shrink: 0;
+}
+
+.data-table-card .el-table__body-wrapper {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.data-table-card .el-table__body-wrapper .el-scrollbar__wrap {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.data-table-card .el-table__body-wrapper .el-scrollbar__bar.is-horizontal {
+  display: none;
 }
 
 .admin-user-create-drawer .el-drawer__body {

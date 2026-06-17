@@ -225,7 +225,7 @@ onMounted(loadAdminUsers);
 
     <ElAlert v-if="errorMessage" :closable="false" show-icon type="error" :title="errorMessage" />
 
-    <ElCard shadow="never">
+    <ElCard class="data-table-card" shadow="never">
       <ElTable v-loading="isLoading" :data="tableData" row-key="id">
         <ElTableColumn prop="userName" label="用户名" min-width="150" />
         <ElTableColumn prop="email" label="邮箱" min-width="220" show-overflow-tooltip />
@@ -252,7 +252,7 @@ onMounted(loadAdminUsers);
             {{ formatDateTime(row.createdAt) }}
           </template>
         </ElTableColumn>
-        <ElTableColumn v-if="canOperate" fixed="right" label="操作" width="430">
+        <ElTableColumn v-if="canOperate" fixed="right" label="操作" width="390">
           <template #default="{ row }">
             <ElButton
               v-if="can(AdminPermissions.AdminUsersUpdate)"

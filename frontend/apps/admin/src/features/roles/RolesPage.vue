@@ -177,7 +177,7 @@ onMounted(loadRoles);
 
     <ElAlert v-if="errorMessage" :closable="false" show-icon type="error" :title="errorMessage" />
 
-    <ElCard shadow="never">
+    <ElCard class="data-table-card" shadow="never">
       <ElTable v-loading="isLoading" :data="tableData" row-key="id">
         <ElTableColumn prop="code" label="编码" min-width="180" show-overflow-tooltip />
         <ElTableColumn prop="name" label="名称" min-width="160" show-overflow-tooltip />
