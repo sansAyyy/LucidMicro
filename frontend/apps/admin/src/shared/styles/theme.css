@@ -593,6 +593,27 @@
   min-width: 0;
 }
 
+.route-fallback {
+  display: grid;
+  min-height: 240px;
+  place-items: center;
+  align-content: center;
+  gap: 10px;
+  color: var(--color-muted);
+}
+
+.route-fallback__icon {
+  color: var(--color-primary);
+  font-size: 24px;
+  animation: route-fallback-spin 1s linear infinite;
+}
+
+@keyframes route-fallback-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .not-found {
   display: grid;
   min-height: 100vh;

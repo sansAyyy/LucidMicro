@@ -107,6 +107,16 @@ export const router = createRouter({
   routes,
 });
 
+router.onError((error, to) => {
+  const message = error instanceof Error ? error.message : String(error);
+
+  ElMessage.error(`页面加载失败：${message}`);
+
+  if (to && to.name !== 'login') {
+    router.replace({ name: 'dashboard' }).catch(() => {});
+  }
+});
+
 router.beforeEach(async (to) => {
   const auth = useAuthStore();
 
