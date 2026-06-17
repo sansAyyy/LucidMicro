@@ -183,6 +183,70 @@ DEPLOY_SSH_PASSPHRASE
 
 无 passphrase 的部署 key 可以不配置该 Secret。
 
+### SSH 认证失败排查
+
+如果 `Deploy over SSH` 报错：
+
+```text
+ssh: handshake failed: ssh: unable to authenticate
+```
+
+先在本机确认私钥可以登录：
+
+```bash
+ssh -i ./lucidmicro_deploy_key deploy@<server-ip>
+```
+
+如果本机也无法登录，检查：
+
+- `DEPLOY_USER` 是否是服务器上真实存在的用户，例如 `deploy`。
+- `DEPLOY_SSH_KEY` 是否填了私钥完整内容，而不是 `.pub` 公钥。
+- `deploy` 用户的 `~/.ssh/authorized_keys` 是否包含对应公钥。
+- `~/.ssh` 权限是否是 `700`，`~/.ssh/authorized_keys` 权限是否是 `600`。
+- 如果 SSH 端口不是 22，是否配置了 `DEPLOY_PORT`。
+- 如果私钥有 passphrase，是否配置了 `DEPLOY_SSH_PASSPHRASE`。
+
+还需要检查服务器是否禁用了 SSH 公钥认证。服务器上执行：
+
+```bash
+sudo sshd -T | grep -E 'pubkeyauthentication|authorizedkeysfile|passwordauthentication'
+```
+
+正常情况下应至少看到：
+
+```text
+pubkeyauthentication yes
+authorizedkeysfile .ssh/authorized_keys .ssh/authorized_keys2
+```
+
+如果 `pubkeyauthentication no`，编辑 SSH 服务配置：
+
+```bash
+sudo nano /etc/ssh/sshd_config
+```
+
+确认或加入：
+
+```text
+PubkeyAuthentication yes
+AuthorizedKeysFile .ssh/authorized_keys .ssh/authorized_keys2
+```
+
+保存后检查配置并重载 SSH：
+
+```bash
+sudo sshd -t
+sudo systemctl reload ssh
+```
+
+不同发行版服务名可能是 `sshd`：
+
+```bash
+sudo systemctl reload sshd
+```
+
+重载前建议保留当前 SSH 会话，不要直接断开；如果配置写错，保留会话可以继续修复。
+
 部署目录示例：
 
 ```bash
