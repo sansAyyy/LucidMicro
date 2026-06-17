@@ -29,6 +29,7 @@ Identity、Notification 不建议直接暴露到公网。
 - 首次部署：阅读 [Docker Compose 快速部署](docker-compose-quickstart.md)。
 - 日常运维：阅读 [Docker Compose 运维操作](docker-compose-operations.md)。
 - 环境变量、拓扑、镜像、端口、风险清单：阅读 [Docker Compose 参考](docker-compose-reference.md)。
+- GitHub Actions 自动部署：阅读 [GitHub Actions 部署](github-actions.md)。
 
 ## 当前边界
 

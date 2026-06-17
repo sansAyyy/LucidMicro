@@ -1,6 +1,6 @@
 services:
   notification-api:
-    image: lucidmicro/notification-api:local
+    image: ${NOTIFICATION_API_IMAGE:-lucidmicro/notification-api:local}
     build:
       context: ../../..
       dockerfile: deploy/docker/backend/Dockerfile
@@ -28,7 +28,7 @@ services:
       - lucid-app
 
   identity-api:
-    image: lucidmicro/identity-api:local
+    image: ${IDENTITY_API_IMAGE:-lucidmicro/identity-api:local}
     build:
       context: ../../..
       dockerfile: deploy/docker/backend/Dockerfile
@@ -59,7 +59,7 @@ services:
       - lucid-app
 
   gateway:
-    image: lucidmicro/gateway:local
+    image: ${GATEWAY_IMAGE:-lucidmicro/gateway:local}
     build:
       context: ../../..
       dockerfile: deploy/docker/backend/Dockerfile
@@ -95,7 +95,7 @@ services:
       - lucid-app
 
   admin-web:
-    image: lucidmicro/admin-web:local
+    image: ${ADMIN_WEB_IMAGE:-lucidmicro/admin-web:local}
     build:
       context: ../../..
       dockerfile: deploy/docker/admin/Dockerfile

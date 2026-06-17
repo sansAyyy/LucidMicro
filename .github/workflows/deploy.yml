@@ -1,0 +1,166 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Restore backend
+        working-directory: backend
+        run: dotnet restore LucidMicro.slnx
+
+      - name: Test backend
+        working-directory: backend
+        run: dotnet test LucidMicro.slnx --configuration Release --no-restore
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          package_json_file: frontend/package.json
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: pnpm install --frozen-lockfile
+
+      - name: Build admin
+        working-directory: frontend
+        run: pnpm build:admin
+
+  build-and-deploy:
+    name: Build and deploy
+    needs: test
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      IMAGE_TAG: ${{ github.sha }}
+      DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set image names
+        run: |
+          image_namespace="$(printf '%s/lucidmicro' "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')"
+          {
+            echo "IDENTITY_API_IMAGE=${REGISTRY}/${image_namespace}/identity-api"
+            echo "NOTIFICATION_API_IMAGE=${REGISTRY}/${image_namespace}/notification-api"
+            echo "GATEWAY_IMAGE=${REGISTRY}/${image_namespace}/gateway"
+            echo "ADMIN_WEB_IMAGE=${REGISTRY}/${image_namespace}/admin-web"
+          } >> "$GITHUB_ENV"
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push identity-api
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: deploy/docker/backend/Dockerfile
+          push: true
+          build-args: |
+            PROJECT_PATH=backend/src/Services/Identity/LucidMicro.Services.Identity.Api/LucidMicro.Services.Identity.Api.csproj
+            APP_DLL=LucidMicro.Services.Identity.Api.dll
+          tags: |
+            ${{ env.IDENTITY_API_IMAGE }}:${{ env.IMAGE_TAG }}
+            ${{ env.IDENTITY_API_IMAGE }}:main
+
+      - name: Build and push notification-api
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: deploy/docker/backend/Dockerfile
+          push: true
+          build-args: |
+            PROJECT_PATH=backend/src/Services/Notification/LucidMicro.Services.Notification.Api/LucidMicro.Services.Notification.Api.csproj
+            APP_DLL=LucidMicro.Services.Notification.Api.dll
+          tags: |
+            ${{ env.NOTIFICATION_API_IMAGE }}:${{ env.IMAGE_TAG }}
+            ${{ env.NOTIFICATION_API_IMAGE }}:main
+
+      - name: Build and push gateway
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: deploy/docker/backend/Dockerfile
+          push: true
+          build-args: |
+            PROJECT_PATH=backend/src/Gateway/LucidMicro.Gateway/LucidMicro.Gateway.csproj
+            APP_DLL=LucidMicro.Gateway.dll
+          tags: |
+            ${{ env.GATEWAY_IMAGE }}:${{ env.IMAGE_TAG }}
+            ${{ env.GATEWAY_IMAGE }}:main
+
+      - name: Build and push admin-web
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: deploy/docker/admin/Dockerfile
+          push: true
+          build-args: |
+            VITE_API_BASE_URL=${{ secrets.GATEWAY_PUBLIC_URL }}
+          tags: |
+            ${{ env.ADMIN_WEB_IMAGE }}:${{ env.IMAGE_TAG }}
+            ${{ env.ADMIN_WEB_IMAGE }}:main
+
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.2.2
+        env:
+          GHCR_USERNAME: ${{ secrets.GHCR_USERNAME }}
+          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+          DEPLOY_PATH: ${{ env.DEPLOY_PATH }}
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          envs: GHCR_USERNAME,GHCR_TOKEN,DEPLOY_PATH
+          script: |
+            set -eu
+            cd "$DEPLOY_PATH"
+            if [ -d .git ]; then
+              git pull --ff-only
+            fi
+            if [ -n "${GHCR_USERNAME:-}" ] && [ -n "${GHCR_TOKEN:-}" ]; then
+              echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USERNAME" --password-stdin
+            fi
+            docker compose --env-file deploy/compose/app/.env -f deploy/compose/app/docker-compose.yml pull
+            docker compose --env-file deploy/compose/app/.env -f deploy/compose/app/docker-compose.yml up -d --no-build --remove-orphans
+            docker image prune -f
