@@ -188,7 +188,7 @@ public sealed class ServiceDependencyDirectionTests
             .Descendants("ProjectReference")
             .Select(reference => reference.Attribute("Include")?.Value)
             .Where(include => !string.IsNullOrWhiteSpace(include))
-            .Select(include => Path.GetFullPath(Path.Combine(Path.GetDirectoryName(fullPath)!, include!)))
+            .Select(include => ResolveProjectReferencePath(fullPath, include!))
             .ToArray();
 
         return new ServiceProject(
@@ -204,6 +204,15 @@ public sealed class ServiceDependencyDirectionTests
     {
         return KnownLayers.FirstOrDefault(layer =>
             projectName.EndsWith($".{layer}", StringComparison.Ordinal)) ?? string.Empty;
+    }
+
+    private static string ResolveProjectReferencePath(string projectPath, string include)
+    {
+        var normalizedInclude = include
+            .Replace('\\', Path.DirectorySeparatorChar)
+            .Replace('/', Path.DirectorySeparatorChar);
+
+        return Path.GetFullPath(Path.Combine(Path.GetDirectoryName(projectPath)!, normalizedInclude));
     }
 
     private static string FindBackendRoot()

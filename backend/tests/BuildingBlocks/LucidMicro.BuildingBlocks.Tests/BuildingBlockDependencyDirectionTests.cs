@@ -124,7 +124,7 @@ public sealed class BuildingBlockDependencyDirectionTests
             .Descendants("ProjectReference")
             .Select(reference => reference.Attribute("Include")?.Value)
             .Where(include => !string.IsNullOrWhiteSpace(include))
-            .Select(include => Path.GetFullPath(Path.Combine(Path.GetDirectoryName(fullPath)!, include!)))
+            .Select(include => ResolveProjectReferencePath(fullPath, include!))
             .ToArray();
 
         return new BuildingBlockProject(
@@ -133,6 +133,15 @@ public sealed class BuildingBlockDependencyDirectionTests
             fullPath,
             relativePath,
             projectReferencePaths);
+    }
+
+    private static string ResolveProjectReferencePath(string projectPath, string include)
+    {
+        var normalizedInclude = include
+            .Replace('\\', Path.DirectorySeparatorChar)
+            .Replace('/', Path.DirectorySeparatorChar);
+
+        return Path.GetFullPath(Path.Combine(Path.GetDirectoryName(projectPath)!, normalizedInclude));
     }
 
     private static string FindBackendRoot()
