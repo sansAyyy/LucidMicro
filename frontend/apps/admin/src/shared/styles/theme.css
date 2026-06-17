@@ -380,21 +380,39 @@
   padding-top: 4px;
 }
 
+.admin-user-assign-roles-drawer .el-drawer__body {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.admin-user-assign-roles-drawer__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  gap: 12px;
+}
+
 .drawer-form {
   display: grid;
   gap: 2px;
 }
 
 .drawer-tip {
-  margin-bottom: 16px;
+  flex-shrink: 0;
+  margin-bottom: 0;
 }
 
 .drawer-table-card {
-  margin-top: 16px;
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .selected-roles-card {
-  margin-bottom: 16px;
+  flex-shrink: 0;
+  margin-bottom: 0;
 }
 
 .selected-roles-header {
@@ -411,10 +429,26 @@
   font-weight: 500;
 }
 
+.selected-roles-body {
+  min-height: 108px;
+  max-height: 108px;
+  overflow-y: auto;
+}
+
 .selected-role-tags {
   display: flex;
   flex-wrap: wrap;
+  align-content: flex-start;
   gap: 8px;
+}
+
+.selected-roles-empty.el-empty {
+  height: 108px;
+  padding: 0;
+}
+
+.selected-roles-empty .el-empty__description {
+  margin-top: 8px;
 }
 
 .drawer-footer {
@@ -428,6 +462,45 @@
   margin-right: auto;
   color: var(--color-muted);
   font-size: 14px;
+}
+
+.admin-user-assign-roles-drawer .drawer-table-card > .el-card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.admin-user-assign-roles-drawer .drawer-table-card .el-table {
+  flex: 1 1 auto;
+  height: 100%;
+  min-height: 0;
+}
+
+.admin-user-assign-roles-drawer .drawer-table-card .el-table__inner-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.admin-user-assign-roles-drawer .drawer-table-card .el-table__header-wrapper {
+  flex-shrink: 0;
+}
+
+.admin-user-assign-roles-drawer .drawer-table-card .el-table__body-wrapper {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.admin-user-assign-roles-drawer .drawer-table-card .el-table__body-wrapper .el-scrollbar__wrap {
+  overflow-x: hidden;
+}
+
+.admin-user-assign-roles-drawer .drawer-table-card .el-table__body-wrapper .el-scrollbar__bar.is-horizontal {
+  display: none;
 }
 
 .notification-detail {

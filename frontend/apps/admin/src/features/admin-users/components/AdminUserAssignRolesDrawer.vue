@@ -213,94 +213,98 @@ watch(
     size="640px"
     title="分配角色"
   >
-    <ElAlert
-      class="drawer-tip"
-      :closable="false"
-      show-icon
-      type="info"
-      :title="`正在为管理员「${adminUser?.displayName || adminUser?.userName || '-'}」分配角色`"
-    />
+    <div class="admin-user-assign-roles-drawer__body">
+      <ElAlert
+        class="drawer-tip"
+        :closable="false"
+        show-icon
+        type="info"
+        :title="`正在为管理员「${adminUser?.displayName || adminUser?.userName || '-'}」分配角色`"
+      />
 
-    <ElCard class="selected-roles-card" shadow="never">
-      <div class="selected-roles-header">
-        <span>已选角色</span>
-        <small>{{ selectedCount }} 个</small>
-      </div>
+      <ElCard class="selected-roles-card" shadow="never">
+        <div class="selected-roles-header">
+          <span>已选角色</span>
+          <small>{{ selectedCount }} 个</small>
+        </div>
 
-      <div v-if="selectedRoles.length > 0" class="selected-role-tags">
-        <ElTag
-          v-for="item in selectedRoles"
-          :key="item.id"
-          closable
-          :type="item.role?.isEnabled === false ? 'info' : 'primary'"
-          @close="removeSelectedRole(item.id)"
-        >
-          {{ item.role ? `${item.role.name} (${item.role.code})` : item.id.slice(0, 8) }}
-        </ElTag>
-      </div>
-
-      <ElEmpty v-else description="尚未选择角色" :image-size="56" />
-    </ElCard>
-
-    <ElCard shadow="never">
-      <ElForm class="toolbar-form" :model="query" inline @submit.prevent="search">
-        <ElFormItem label="关键字">
-          <ElInput
-            v-model.trim="query.keyword"
-            clearable
-            placeholder="角色编码、名称"
-            :prefix-icon="Search"
-            @keyup.enter="search"
-          />
-        </ElFormItem>
-
-        <ElFormItem>
-          <ElButton :icon="Search" type="primary" @click="search">查询</ElButton>
-          <ElButton :icon="Refresh" @click="reset">重置</ElButton>
-        </ElFormItem>
-      </ElForm>
-    </ElCard>
-
-    <ElAlert v-if="errorMessage" class="drawer-tip" :closable="false" show-icon type="error" :title="errorMessage" />
-
-    <ElCard class="drawer-table-card" shadow="never">
-      <ElTable
-        ref="tableRef"
-        v-loading="isLoading"
-        :data="roles"
-        row-key="id"
-        @selection-change="handleSelectionChange"
-      >
-        <ElTableColumn type="selection" width="48" :selectable="selectable" reserve-selection />
-        <ElTableColumn prop="code" label="编码" min-width="140" show-overflow-tooltip />
-        <ElTableColumn prop="name" label="名称" min-width="140" show-overflow-tooltip />
-        <ElTableColumn prop="description" label="说明" min-width="180" show-overflow-tooltip>
-          <template #default="{ row }">
-            {{ row.description || '-' }}
-          </template>
-        </ElTableColumn>
-        <ElTableColumn label="状态" width="92">
-          <template #default="{ row }">
-            <ElTag :type="row.isEnabled ? 'success' : 'info'">
-              {{ row.isEnabled ? '启用' : '停用' }}
+        <div class="selected-roles-body">
+          <div v-if="selectedRoles.length > 0" class="selected-role-tags">
+            <ElTag
+              v-for="item in selectedRoles"
+              :key="item.id"
+              closable
+              :type="item.role?.isEnabled === false ? 'info' : 'primary'"
+              @close="removeSelectedRole(item.id)"
+            >
+              {{ item.role ? `${item.role.name} (${item.role.code})` : item.id.slice(0, 8) }}
             </ElTag>
-          </template>
-        </ElTableColumn>
-      </ElTable>
+          </div>
 
-      <div class="table-footer">
-        <ElPagination
-          background
-          layout="total, sizes, prev, pager, next"
-          :current-page="query.pageNumber"
-          :page-size="query.pageSize"
-          :page-sizes="[10, 20, 50]"
-          :total="totalCount"
-          @current-change="changePage"
-          @size-change="changePageSize"
-        />
-      </div>
-    </ElCard>
+          <ElEmpty v-else class="selected-roles-empty" description="尚未选择角色" :image-size="56" />
+        </div>
+      </ElCard>
+
+      <ElCard shadow="never">
+        <ElForm class="toolbar-form" :model="query" inline @submit.prevent="search">
+          <ElFormItem label="关键字">
+            <ElInput
+              v-model.trim="query.keyword"
+              clearable
+              placeholder="角色编码、名称"
+              :prefix-icon="Search"
+              @keyup.enter="search"
+            />
+          </ElFormItem>
+
+          <ElFormItem>
+            <ElButton :icon="Search" type="primary" @click="search">查询</ElButton>
+            <ElButton :icon="Refresh" @click="reset">重置</ElButton>
+          </ElFormItem>
+        </ElForm>
+      </ElCard>
+
+      <ElAlert v-if="errorMessage" class="drawer-tip" :closable="false" show-icon type="error" :title="errorMessage" />
+
+      <ElCard class="drawer-table-card" shadow="never">
+        <ElTable
+          ref="tableRef"
+          v-loading="isLoading"
+          :data="roles"
+          row-key="id"
+          @selection-change="handleSelectionChange"
+        >
+          <ElTableColumn type="selection" width="44" :selectable="selectable" reserve-selection />
+          <ElTableColumn prop="code" label="编码" min-width="120" show-overflow-tooltip />
+          <ElTableColumn prop="name" label="名称" min-width="120" show-overflow-tooltip />
+          <ElTableColumn prop="description" label="说明" min-width="156" show-overflow-tooltip>
+            <template #default="{ row }">
+              {{ row.description || '-' }}
+            </template>
+          </ElTableColumn>
+          <ElTableColumn label="状态" width="76">
+            <template #default="{ row }">
+              <ElTag :type="row.isEnabled ? 'success' : 'info'">
+                {{ row.isEnabled ? '启用' : '停用' }}
+              </ElTag>
+            </template>
+          </ElTableColumn>
+        </ElTable>
+
+        <div class="table-footer">
+          <ElPagination
+            background
+            layout="total, sizes, prev, pager, next"
+            :current-page="query.pageNumber"
+            :page-size="query.pageSize"
+            :page-sizes="[10, 20, 50]"
+            :total="totalCount"
+            @current-change="changePage"
+            @size-change="changePageSize"
+          />
+        </div>
+      </ElCard>
+    </div>
 
     <template #footer>
       <div class="drawer-footer">
