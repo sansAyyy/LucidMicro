@@ -129,6 +129,15 @@ Caddy 证书和运行数据保存在 `caddy_data` volume 中。不要用 `down -
 
 ## 多实例验证
 
+服务器长期双节点部署时，优先把副本数写入 `deploy/compose/app/.env`：
+
+```env
+IDENTITY_API_REPLICAS=2
+NOTIFICATION_API_REPLICAS=2
+```
+
+GitHub Actions 发布会读取这两个变量，并在 `up -d` 时显式传入 `--scale`，避免自动部署把手动 scale 出来的实例收回单节点。
+
 ```powershell
 docker compose --env-file deploy/compose/app/.env -f deploy/compose/app/docker-compose.yml up -d --no-build --scale notification-api=2 --scale identity-api=2
 ```

@@ -272,6 +272,26 @@ GATEWAY_IMAGE=ghcr.io/<owner>/lucidmicro/gateway:main
 ADMIN_WEB_IMAGE=ghcr.io/<owner>/lucidmicro/admin-web:main
 ```
 
+Identity 和 Notification 如果使用双节点部署，在服务器 `deploy/compose/app/.env` 中配置：
+
+```env
+IDENTITY_API_REPLICAS=2
+NOTIFICATION_API_REPLICAS=2
+```
+
+Actions 部署时会按这两个值执行：
+
+```bash
+docker compose \
+  --env-file deploy/compose/app/.env \
+  -f deploy/compose/app/docker-compose.yml \
+  up -d --no-build --remove-orphans \
+  --scale "identity-api=${IDENTITY_API_REPLICAS}" \
+  --scale "notification-api=${NOTIFICATION_API_REPLICAS}"
+```
+
+如果不配置，默认按单节点 `1` 部署。不要只在服务器手动执行一次 `docker compose up --scale ...` 而不写入 `.env`，否则后续 Actions 发布可能把副本数恢复为默认值。
+
 其余数据库、Redis、RabbitMQ、Consul、JWT、端口和域名变量继续按 app compose 文档配置。
 
 如果 GHCR package 是私有的，先在服务器登录一次：
@@ -298,7 +318,9 @@ git pull --ff-only
 cd /opt/lucidmicro
 git pull
 docker compose --env-file deploy/compose/app/.env -f deploy/compose/app/docker-compose.yml pull
-docker compose --env-file deploy/compose/app/.env -f deploy/compose/app/docker-compose.yml up -d --no-build --remove-orphans
+IDENTITY_API_REPLICAS="$(grep -E '^IDENTITY_API_REPLICAS=' deploy/compose/app/.env | tail -n 1 | cut -d= -f2- | tr -d '\r' || true)"
+NOTIFICATION_API_REPLICAS="$(grep -E '^NOTIFICATION_API_REPLICAS=' deploy/compose/app/.env | tail -n 1 | cut -d= -f2- | tr -d '\r' || true)"
+docker compose --env-file deploy/compose/app/.env -f deploy/compose/app/docker-compose.yml up -d --no-build --remove-orphans --scale "identity-api=${IDENTITY_API_REPLICAS:-1}" --scale "notification-api=${NOTIFICATION_API_REPLICAS:-1}"
 ```
 
 查看状态：

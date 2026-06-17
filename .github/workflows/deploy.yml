@@ -176,6 +176,12 @@ jobs:
             if [ -n "${GHCR_USERNAME:-}" ] && [ -n "${GHCR_TOKEN:-}" ]; then
               echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USERNAME" --password-stdin
             fi
+            identity_api_replicas="$(grep -E '^IDENTITY_API_REPLICAS=' deploy/compose/app/.env | tail -n 1 | cut -d= -f2- | tr -d '\r' || true)"
+            notification_api_replicas="$(grep -E '^NOTIFICATION_API_REPLICAS=' deploy/compose/app/.env | tail -n 1 | cut -d= -f2- | tr -d '\r' || true)"
+            identity_api_replicas="${identity_api_replicas:-1}"
+            notification_api_replicas="${notification_api_replicas:-1}"
+            case "$identity_api_replicas" in (*[!0-9]*|"") echo "IDENTITY_API_REPLICAS must be a positive integer."; exit 1;; esac
+            case "$notification_api_replicas" in (*[!0-9]*|"") echo "NOTIFICATION_API_REPLICAS must be a positive integer."; exit 1;; esac
             docker compose --env-file deploy/compose/app/.env -f deploy/compose/app/docker-compose.yml pull
-            docker compose --env-file deploy/compose/app/.env -f deploy/compose/app/docker-compose.yml up -d --no-build --remove-orphans
+            docker compose --env-file deploy/compose/app/.env -f deploy/compose/app/docker-compose.yml up -d --no-build --remove-orphans --scale "identity-api=${identity_api_replicas}" --scale "notification-api=${notification_api_replicas}"
             docker image prune -f

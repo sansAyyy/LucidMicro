@@ -303,6 +303,15 @@ Copy-Item deploy/compose/app/.env.example deploy/compose/app/.env
 
 应用 compose 不负责数据库迁移。启动 `up -d` 前，必须已经手动完成数据库创建和迁移。
 
+GitHub Actions 部署会读取 app `.env` 中的镜像和副本数变量。服务器双节点部署时，建议显式配置：
+
+```env
+IDENTITY_API_REPLICAS=2
+NOTIFICATION_API_REPLICAS=2
+```
+
+如果不配置，Actions 部署脚本会按单节点 `1` 处理。只手动执行一次 `docker compose up --scale ...` 不足以长期保留副本数；后续自动发布仍应以 `.env` 中的副本数为准。
+
 ### Identity
 
 必需：
