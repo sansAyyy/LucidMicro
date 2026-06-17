@@ -24,7 +24,7 @@
       },
       "gridPos": {
         "h": 4,
-        "w": 6,
+        "w": 5,
         "x": 0,
         "y": 0
       },
@@ -85,8 +85,8 @@
       },
       "gridPos": {
         "h": 4,
-        "w": 6,
-        "x": 6,
+        "w": 5,
+        "x": 5,
         "y": 0
       },
       "id": 2,
@@ -150,8 +150,8 @@
       },
       "gridPos": {
         "h": 4,
-        "w": 6,
-        "x": 12,
+        "w": 5,
+        "x": 10,
         "y": 0
       },
       "id": 3,
@@ -198,8 +198,8 @@
       },
       "gridPos": {
         "h": 4,
-        "w": 6,
-        "x": 18,
+        "w": 4,
+        "x": 15,
         "y": 0
       },
       "id": 4,
@@ -228,6 +228,71 @@
         }
       ],
       "title": "Observed Services",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "green",
+                "value": 2
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 5,
+        "x": 19,
+        "y": 0
+      },
+      "id": 16,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "expr": "count(count by (service_name, service_instance_id) (rate(http_server_request_duration_seconds_count{service_name=~\"$service\", service_instance_id=~\"$instance\"}[5m])))",
+          "legendFormat": "instances",
+          "refId": "A"
+        }
+      ],
+      "title": "Active Instances",
       "type": "stat"
     },
     {
@@ -1052,7 +1117,7 @@
           "type": "prometheus",
           "uid": "prometheus"
         },
-        "definition": "label_values(http_server_request_duration_seconds_count{service_name=~\"$service\"}, service_instance_id)",
+        "definition": "query_result(sum by (service_name, service_instance_id) (rate(http_server_request_duration_seconds_count{service_name=~\"$service\"}[5m])))",
         "hide": 0,
         "includeAll": true,
         "label": "Instance",
@@ -1060,11 +1125,11 @@
         "name": "instance",
         "options": [],
         "query": {
-          "query": "label_values(http_server_request_duration_seconds_count{service_name=~\"$service\"}, service_instance_id)",
+          "query": "query_result(sum by (service_name, service_instance_id) (rate(http_server_request_duration_seconds_count{service_name=~\"$service\"}[5m])))",
           "refId": "StandardVariableQuery"
         },
-        "refresh": 1,
-        "regex": "",
+        "refresh": 2,
+        "regex": "/service_instance_id=\"([^\\\"]+)\"/",
         "skipUrlSync": false,
         "sort": 1,
         "type": "query"
