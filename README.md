@@ -12,6 +12,12 @@ LucidMicro 是一个面向微服务应用的快速开发框架。当前仓库已
 - 部署：`deploy/compose/infra`、`deploy/compose/app` 和 `deploy/compose/caddy` 支持单机联调、部署和 HTTPS 域名入口。
 - 模板：已提供后端 CRUD 模块模板和 `scripts/new-crud.ps1`。
 
+## 架构总览
+
+当前后端运行态支持多节点部署。下图按 Identity 和 Notification 各 2 个实例展示，Gateway 通过 Consul 服务发现和 YARP RoundRobin 做转发。
+
+![LucidMicro runtime topology](docs/assets/architecture/runtime-topology.svg)
+
 ## 快速开始
 
 本地开发建议先看 [本地开发快速开始](docs/development/local-setup.md)。
