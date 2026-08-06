@@ -196,10 +196,112 @@ public Task<IActionResult> GetAdminUsers(...)
 - 按钮背后的 API 必须有同等后端权限保护。
 - Role 只是权限集合，不直接写进业务授权判断。
 
-权限来源可以分阶段演进：
+### 微服务授权边界
 
-- 第一版：登录后 `/me` 返回 permissions，前端用于体验控制；后端可从 token claim 或服务端查询中完成 API 授权。
-- 后续：如果 permissions 放入 access token，角色变更后要考虑 token 刷新或版本失效。
+Identity 负责维护用户、角色和权限关系，并签发身份凭证；每个业务服务负责验证凭证并对自己的 API 执行最终授权。Gateway 可以提前验证 token、限流和拒绝明显非法请求，但不能成为唯一授权边界，避免请求绕过 Gateway 后失去保护。
+
+权限检查按层次划分：
+
+- Gateway：认证、限流和路由级粗粒度策略，不承载最终业务授权。
+- API：通过 `RequirePermission` 检查调用者是否具备执行该操作的能力。
+- Application：检查数据归属、租户隔离、自操作限制等资源级授权。
+- Domain：保证“不能删除最后一个超级管理员”等不依赖调用入口的业务不变量。
+- 内部接口：使用服务身份、独立 audience/scope 或 mTLS，不复用普通管理员权限。
+
+各业务服务不得在每次请求中同步查询 Identity，否则 Identity 会成为所有服务的延迟和可用性瓶颈。
+
+### 第一阶段：权限写入 Access Token
+
+当前权限数量较少，第一阶段在 Access Token 中写入重复的 `permission` claim。Role 不写入授权判断；Identity 在登录和刷新 token 时展开 Role，计算最终 Permission 集合。
+
+```json
+{
+  "sub": "admin-user-id",
+  "permission": [
+    "identity.admin-users.read",
+    "identity.admin-users.create",
+    "notification.notifications.read"
+  ],
+  "auth_ver": 1
+}
+```
+
+实现要求：
+
+- `AccessTokenClaims` 必须支持多个同名 claim，不能使用只能保存一个同名键的字典表达 permissions。
+- 密码登录、短信登录和 refresh 必须复用同一个 claims factory，避免不同登录方式签发出不同权限内容。
+- 每个服务独立验证 token，并由 `PermissionAuthorizationHandler` 从 `permission` claim 完成授权。
+- Access Token 建议保持 5～15 分钟有效期；Refresh Token 负责续期，并支持轮换和撤销。
+- `/me` 继续返回 permissions，供前端控制路由、菜单和按钮，但前端结果不参与后端安全判断。
+
+JWT 经过 Base64Url 编码后会比原始 JSON 更大。几十个权限通常可以直接携带，但随着权限数量和权限 code 长度增长，可能触发 Gateway、Ingress 或 Web Server 的请求头限制。项目将 4 KB 作为 Access Token 的目标体积预算，并通过自动化测试记录序列化后的 token 字节数；实际硬限制仍以部署环境配置为准。
+
+不要为了压缩 token 而改为仅携带 Role。Role 是管理侧的权限集合，不是跨服务稳定的授权契约；让业务服务解释 Identity 的 Role 会造成反向耦合。
+
+### 第二阶段：固定尺寸 Token 与权限快照
+
+当单个用户可能拥有接近 100 个权限、Access Token 接近体积预算，或权限变更需要更快生效时，token 改为只携带稳定身份和授权版本：
+
+```json
+{
+  "sub": "admin-user-id",
+  "tenant": "tenant-id",
+  "auth_ver": 12
+}
+```
+
+授权处理器按以下顺序读取权限：
+
+```text
+Access Token (sub + auth_ver)
+            |
+            v
+服务本地内存缓存
+            |
+            v  miss
+分布式权限快照
+            |
+            v  miss
+Identity/Auth 查询并回填缓存
+```
+
+建议的缓存结构：
+
+```text
+authz:user:{userId}:current-version       -> 12
+authz:user:{userId}:v:{authVersion}       -> [permission codes]
+```
+
+角色、权限、密码或账号状态变化时，Identity 必须：
+
+1. 在同一个业务操作中递增用户的 `auth_ver`。
+2. 更新分布式权限快照并删除旧版本快照。
+3. 发布 `UserPermissionsChanged` 或 `UserAuthorizationChanged` 集成事件。
+4. 各服务收到事件后清除对应的本地缓存。
+
+授权处理器必须比较 token 中的 `auth_ver` 与当前版本。缓存未命中且无法确认当前版本时应 fail closed，返回无权限或认证失败，不能为了可用性默认放行。
+
+本地缓存会在可用性和立即失效之间产生权衡：普通权限变更可以使用短 TTL 加事件失效；账号停用、密码泄漏等需要立即撤销的场景，应查询分布式当前版本或维护紧急 denylist。
+
+### 第三阶段：面向服务的凭证
+
+当服务数量、权限数量或外部调用方明显增加后，再根据需要引入更复杂的凭证模型：
+
+- Token Exchange：为目标 audience 签发短期 token，只包含目标服务所需的 scopes/permissions。
+- Opaque Token + Introspection：token 只保存随机引用，由授权服务返回身份和权限；服务端需要缓存 introspection 结果。
+- 服务身份凭证：内部调用使用 client credentials、独立 audience/scope 或 mTLS，与管理员 Access Token 分离。
+
+无论权限来源如何演进，Controller/Endpoint 上的 `RequirePermission` 契约保持不变，只替换 `PermissionAuthorizationHandler` 获取权限集合的实现。
+
+### 演进路线
+
+| 阶段 | 适用条件 | Token 内容 | 权限来源 | 主要代价 |
+| --- | --- | --- | --- | --- |
+| 第一阶段 | 当前权限较少、服务较少 | `sub + permission[] + auth_ver` | token claim | 权限变更在旧 token 过期前可能延迟生效 |
+| 第二阶段 | 权限接近 100 个或 token 接近 4 KB | `sub + tenant + auth_ver` | 本地缓存 + 分布式权限快照 | 增加缓存一致性、版本校验和失效事件 |
+| 第三阶段 | 服务和外部调用方明显增多 | 面向 audience 的短期 token 或 opaque token | Token Exchange / Introspection | 增加授权基础设施和运行依赖 |
+
+第一阶段实施时就保留 `auth_ver`，使后续切换到权限快照不需要改变 token 主体身份模型。不要仅按权限条数机械切换阶段，应同时观察序列化 token 大小、权限变更时效和授权服务可用性要求。
 
 ## 前端权限
 
@@ -265,8 +367,11 @@ PUT /api/identity/admin-users/{id}/roles
 
 1. 在 Identity 服务增加 Permission、Role、RolePermission、AdminUserRole 模型与迁移。
 2. 种子写入内置权限、`SuperAdmin` 角色和初始管理员绑定。
-3. 登录态接口返回当前用户 permissions。
-4. 增加后端 `RequirePermission` 授权能力。
-5. 为 AdminUsers、Notifications 等现有 API 补齐权限要求。
-6. 前端移除“未返回 permissions 默认放行”的兼容策略。
-7. 后续再做角色列表、角色编辑和权限分配页面。
+3. 重构 `AccessTokenClaims` 并增加统一 claims factory，使密码登录、短信登录和 refresh 都签发 `permission` 与 `auth_ver`。
+4. 在 Auth BuildingBlock 增加 `RequirePermission`、动态 policy provider、requirement 和 authorization handler。
+5. 为 AdminUsers、Roles、Permissions、Notifications 等现有 API 补齐权限常量和权限要求。
+6. 为内部 API 增加独立的服务身份认证和 audience/scope，不允许匿名调用，也不复用管理员权限。
+7. 将 Access Token 调整为短期 token，补充 Refresh Token 轮换、撤销和账号状态变更后的失效机制。
+8. 增加 401/403、跨服务授权、token 体积预算和权限变更时效测试。
+9. 前端移除“未返回 permissions 默认放行”的兼容策略。
+10. 后续再做角色列表、角色编辑和权限分配页面；达到第二阶段条件后引入权限快照和失效事件。
