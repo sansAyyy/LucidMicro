@@ -1,5 +1,7 @@
 using LucidMicro.BuildingBlocks.AspNetCore.Results;
+using LucidMicro.BuildingBlocks.Auth.AspNetCore.Authorization;
 using LucidMicro.BuildingBlocks.Persistence.Abstractions.Models;
+using LucidMicro.Services.Identity.Application.Authorization;
 using LucidMicro.Services.Identity.Application.Features.Roles.Abstractions;
 using LucidMicro.Services.Identity.Application.Features.Roles.Dtos.Requests;
 using LucidMicro.Services.Identity.Application.Features.Roles.Dtos.Responses;
@@ -21,6 +23,7 @@ public sealed class RolesController : ControllerBase
     }
 
     [HttpGet]
+    [RequirePermission(IdentityPermissions.RolesRead)]
     public async Task<ActionResult<PageResult<RoleResponse>>> GetList(
         [FromQuery] GetRolesRequest request,
         CancellationToken cancellationToken)
@@ -31,6 +34,7 @@ public sealed class RolesController : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
+    [RequirePermission(IdentityPermissions.RolesRead)]
     public async Task<ActionResult<RoleDetailResponse>> GetById(
         Guid id,
         CancellationToken cancellationToken)
@@ -41,6 +45,7 @@ public sealed class RolesController : ControllerBase
     }
 
     [HttpPost]
+    [RequirePermission(IdentityPermissions.RolesManage)]
     public async Task<ActionResult<RoleResponse>> Create(
         CreateRoleRequest request,
         CancellationToken cancellationToken)
@@ -53,6 +58,7 @@ public sealed class RolesController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [RequirePermission(IdentityPermissions.RolesManage)]
     public async Task<ActionResult> Update(
         Guid id,
         UpdateRoleRequest request,
@@ -64,6 +70,7 @@ public sealed class RolesController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [RequirePermission(IdentityPermissions.RolesManage)]
     public async Task<ActionResult> Delete(
         Guid id,
         CancellationToken cancellationToken)
@@ -74,6 +81,7 @@ public sealed class RolesController : ControllerBase
     }
 
     [HttpPut("{id:guid}/permissions")]
+    [RequirePermission(IdentityPermissions.RolesAssignPermissions)]
     public async Task<ActionResult> AssignPermissions(
         Guid id,
         AssignRolePermissionsRequest request,

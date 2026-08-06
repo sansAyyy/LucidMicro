@@ -1,8 +1,10 @@
 using LucidMicro.BuildingBlocks.AspNetCore.Results;
+using LucidMicro.BuildingBlocks.Auth.AspNetCore.Authorization;
 using LucidMicro.BuildingBlocks.Application.Results;
 using LucidMicro.BuildingBlocks.Persistence.Abstractions.Models;
 using LucidMicro.Services.Notification.Api.Contracts;
 using LucidMicro.Services.Notification.Application.Features.Notifications.Abstractions;
+using LucidMicro.Services.Notification.Application.Authorization;
 using LucidMicro.Services.Notification.Application.Features.Notifications.Dtos.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -23,6 +25,7 @@ public sealed class NotificationsController : ControllerBase
     }
 
     [HttpGet]
+    [RequirePermission(NotificationPermissions.NotificationsRead)]
     public async Task<ActionResult<PageResult<ContractNotificationResponse>>> GetList(
         [FromQuery] GetNotificationsRequest request,
         CancellationToken cancellationToken)
@@ -37,6 +40,7 @@ public sealed class NotificationsController : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
+    [RequirePermission(NotificationPermissions.NotificationsRead)]
     public async Task<ActionResult<ContractNotificationResponse>> GetById(
         Guid id,
         CancellationToken cancellationToken)

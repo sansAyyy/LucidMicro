@@ -7,6 +7,7 @@ using LucidMicro.BuildingBlocks.Persistence.Abstractions.Contracts;
 using LucidMicro.Contracts.Notification;
 using LucidMicro.Contracts.Notification.Http.Requests;
 using LucidMicro.Services.Identity.Application.ExternalServices.Notifications;
+using LucidMicro.Services.Identity.Application.Features.AdminAuth.Abstractions;
 using LucidMicro.Services.Identity.Application.Features.SmsLogin.Abstractions;
 using LucidMicro.Services.Identity.Application.Features.SmsLogin.Dtos.Requests;
 using LucidMicro.Services.Identity.Application.Features.SmsLogin.Dtos.Responses;
@@ -20,6 +21,7 @@ namespace LucidMicro.Services.Identity.Application.Features.SmsLogin.Services;
 public sealed class SmsLoginApplicationService : ISmsLoginApplicationService
 {
     private readonly IAccessTokenService _accessTokenService;
+    private readonly IAdminAccessTokenClaimsFactory _accessTokenClaimsFactory;
     private readonly IRepository<AdminUser, Guid> _adminUsers;
     private readonly ISmsLoginCodeGenerator _codeGenerator;
     private readonly ISmsLoginCodeStore _codeStore;
@@ -42,7 +44,8 @@ public sealed class SmsLoginApplicationService : ISmsLoginApplicationService
         IUnitOfWork unitOfWork,
         IAccessTokenService accessTokenService,
         IRefreshTokenService refreshTokenService,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        IAdminAccessTokenClaimsFactory accessTokenClaimsFactory)
     {
         ArgumentNullException.ThrowIfNull(sendCodeValidator);
         ArgumentNullException.ThrowIfNull(loginValidator);
@@ -55,6 +58,7 @@ public sealed class SmsLoginApplicationService : ISmsLoginApplicationService
         ArgumentNullException.ThrowIfNull(accessTokenService);
         ArgumentNullException.ThrowIfNull(refreshTokenService);
         ArgumentNullException.ThrowIfNull(timeProvider);
+        ArgumentNullException.ThrowIfNull(accessTokenClaimsFactory);
         options.Validate();
 
         _sendCodeValidator = sendCodeValidator;
@@ -68,6 +72,7 @@ public sealed class SmsLoginApplicationService : ISmsLoginApplicationService
         _accessTokenService = accessTokenService;
         _refreshTokenService = refreshTokenService;
         _timeProvider = timeProvider;
+        _accessTokenClaimsFactory = accessTokenClaimsFactory;
     }
 
     public async Task<Result> SendCodeAsync(
@@ -161,18 +166,15 @@ public sealed class SmsLoginApplicationService : ISmsLoginApplicationService
         adminUser.MarkLogin(_timeProvider.GetUtcNow().UtcDateTime);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return Result<SmsLoginResponse>.Success(CreateLoginResponse(adminUser));
+        return Result<SmsLoginResponse>.Success(
+            await CreateLoginResponseAsync(adminUser, cancellationToken));
     }
 
-    private SmsLoginResponse CreateLoginResponse(AdminUser adminUser)
+    private async Task<SmsLoginResponse> CreateLoginResponseAsync(
+        AdminUser adminUser,
+        CancellationToken cancellationToken)
     {
-        var tokenClaims = new AccessTokenClaims(
-            adminUser.Id.ToString(),
-            adminUser.UserName,
-            new Dictionary<string, string>
-            {
-                ["email"] = adminUser.Email
-            });
+        var tokenClaims = await _accessTokenClaimsFactory.CreateAsync(adminUser, cancellationToken);
         var accessToken = _accessTokenService.GenerateAccessToken(tokenClaims);
         var refreshToken = _refreshTokenService.GenerateRefreshToken(tokenClaims);
 

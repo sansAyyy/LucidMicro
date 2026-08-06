@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\BuildingBlocks\Web\AspNetCore\LucidMicro.BuildingBlocks.AspNetCore.Core\LucidMicro.BuildingBlocks.AspNetCore.Core.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Web\Auth\LucidMicro.BuildingBlocks.Auth.AspNetCore\LucidMicro.BuildingBlocks.Auth.AspNetCore.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\Web\Cors\LucidMicro.BuildingBlocks.Cors.AspNetCore\LucidMicro.BuildingBlocks.Cors.AspNetCore.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\Operations\HealthChecks\LucidMicro.BuildingBlocks.HealthChecks.AspNetCore\LucidMicro.BuildingBlocks.HealthChecks.AspNetCore.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\Operations\Logging\LucidMicro.BuildingBlocks.Logging.Serilog\LucidMicro.BuildingBlocks.Logging.Serilog.csproj" />

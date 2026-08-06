@@ -83,6 +83,10 @@ public sealed class AdminAuthApplicationServiceTests
         var now = new DateTimeOffset(2026, 5, 24, 12, 0, 0, TimeSpan.Zero);
         var adminUser = CreateAdminUser();
         var context = CreateContext(adminUser, now);
+        context.AdminUserPermissionRepository.SetPermissions(
+            adminUser.Id,
+            "identity.admin-users.read",
+            "identity.roles.read");
 
         var result = await context.Service.LoginAsync(new LoginAdminUserRequest
         {
@@ -102,6 +106,13 @@ public sealed class AdminAuthApplicationServiceTests
         Assert.Equal(adminUser.Id.ToString(), context.AccessTokenService.LastClaims.Subject);
         Assert.Equal(adminUser.UserName, context.AccessTokenService.LastClaims.Name);
         Assert.Equal(adminUser.Email, context.AccessTokenService.LastClaims.AdditionalClaims?["email"]);
+        Assert.Equal("1", context.AccessTokenService.LastClaims.AdditionalClaims?["auth_ver"]);
+        Assert.Equal(
+            ["identity.admin-users.read", "identity.roles.read"],
+            context.AccessTokenService.LastClaims.AdditionalClaimValues
+                .Where(claim => claim.Type == "permission")
+                .Select(claim => claim.Value)
+                .ToArray());
         Assert.NotNull(context.AccessTokenService.LastRefreshClaims);
         Assert.Equal(adminUser.Id.ToString(), context.AccessTokenService.LastRefreshClaims.Subject);
         Assert.Equal(adminUser.UserName, context.AccessTokenService.LastRefreshClaims.Name);
@@ -449,6 +460,7 @@ public sealed class AdminAuthApplicationServiceTests
         var service = new AdminAuthApplicationService(
             repository,
             adminUserPermissionRepository,
+            new AdminAccessTokenClaimsFactory(adminUserPermissionRepository),
             unitOfWork,
             passwordHashingService,
             accessTokenService,

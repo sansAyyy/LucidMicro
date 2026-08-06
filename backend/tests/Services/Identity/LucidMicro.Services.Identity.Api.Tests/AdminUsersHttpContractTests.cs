@@ -93,7 +93,14 @@ public sealed class AdminUsersHttpContractTests
             claims:
             [
                 new Claim(JwtRegisteredClaimNames.Sub, "admin-id"),
-                new Claim(JwtRegisteredClaimNames.UniqueName, "admin")
+                new Claim(JwtRegisteredClaimNames.UniqueName, "admin"),
+                new Claim("permission", "identity.admin-users.read"),
+                new Claim("permission", "identity.admin-users.create"),
+                new Claim("permission", "identity.admin-users.update"),
+                new Claim("permission", "identity.admin-users.enable"),
+                new Claim("permission", "identity.admin-users.disable"),
+                new Claim("permission", "identity.admin-users.reset-password"),
+                new Claim("permission", "identity.admin-users.delete")
             ],
             notBefore: DateTime.UtcNow.AddMinutes(-1),
             expires: DateTime.UtcNow.AddMinutes(30),

@@ -1,5 +1,7 @@
 using LucidMicro.BuildingBlocks.AspNetCore.Results;
+using LucidMicro.BuildingBlocks.Auth.AspNetCore.Authorization;
 using LucidMicro.BuildingBlocks.Persistence.Abstractions.Models;
+using LucidMicro.Services.Identity.Application.Authorization;
 using LucidMicro.Services.Identity.Application.Features.AdminUsers.Abstractions;
 using LucidMicro.Services.Identity.Application.Features.AdminUsers.Dtos.Requests;
 using LucidMicro.Services.Identity.Application.Features.AdminUsers.Dtos.Responses;
@@ -21,6 +23,7 @@ public sealed class AdminUsersController : ControllerBase
     }
 
     [HttpGet]
+    [RequirePermission(IdentityPermissions.AdminUsersRead)]
     public async Task<ActionResult<PageResult<AdminUserResponse>>> GetList(
         [FromQuery] GetAdminUsersRequest request,
         CancellationToken cancellationToken)
@@ -31,6 +34,7 @@ public sealed class AdminUsersController : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
+    [RequirePermission(IdentityPermissions.AdminUsersRead)]
     public async Task<ActionResult<AdminUserResponse>> GetById(
         Guid id,
         CancellationToken cancellationToken)
@@ -41,6 +45,7 @@ public sealed class AdminUsersController : ControllerBase
     }
 
     [HttpPost]
+    [RequirePermission(IdentityPermissions.AdminUsersCreate)]
     public async Task<ActionResult<AdminUserResponse>> Create(
         CreateAdminUserRequest request,
         CancellationToken cancellationToken)
@@ -53,6 +58,7 @@ public sealed class AdminUsersController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [RequirePermission(IdentityPermissions.AdminUsersUpdate)]
     public async Task<ActionResult> Update(
         Guid id,
         UpdateAdminUserRequest request,
@@ -64,6 +70,7 @@ public sealed class AdminUsersController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [RequirePermission(IdentityPermissions.AdminUsersDelete)]
     public async Task<ActionResult> Delete(
         Guid id,
         CancellationToken cancellationToken)
@@ -74,6 +81,7 @@ public sealed class AdminUsersController : ControllerBase
     }
 
     [HttpPut("{id:guid}/activate")]
+    [RequirePermission(IdentityPermissions.AdminUsersEnable)]
     public async Task<ActionResult> Activate(
         Guid id,
         CancellationToken cancellationToken)
@@ -84,6 +92,7 @@ public sealed class AdminUsersController : ControllerBase
     }
 
     [HttpPut("{id:guid}/deactivate")]
+    [RequirePermission(IdentityPermissions.AdminUsersDisable)]
     public async Task<ActionResult> Deactivate(
         Guid id,
         CancellationToken cancellationToken)
@@ -94,6 +103,7 @@ public sealed class AdminUsersController : ControllerBase
     }
 
     [HttpPut("{id:guid}/password")]
+    [RequirePermission(IdentityPermissions.AdminUsersResetPassword)]
     public async Task<ActionResult> ResetPassword(
         Guid id,
         ResetAdminUserPasswordRequest request,
@@ -105,6 +115,7 @@ public sealed class AdminUsersController : ControllerBase
     }
 
     [HttpPut("{id:guid}/roles")]
+    [RequirePermission(IdentityPermissions.AdminUsersUpdate)]
     public async Task<ActionResult> AssignRoles(
         Guid id,
         AssignAdminUserRolesRequest request,

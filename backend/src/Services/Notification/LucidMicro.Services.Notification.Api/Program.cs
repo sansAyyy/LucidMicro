@@ -1,4 +1,5 @@
 using LucidMicro.BuildingBlocks.AspNetCore.ExceptionHandling;
+using LucidMicro.BuildingBlocks.Auth.AspNetCore.DependencyInjection;
 using LucidMicro.BuildingBlocks.Cors.AspNetCore.DependencyInjection;
 using LucidMicro.BuildingBlocks.Cors.AspNetCore.Options;
 using LucidMicro.BuildingBlocks.HealthChecks.AspNetCore;
@@ -25,7 +26,7 @@ builder.Services.AddLucidOpenApi(
     builder.Configuration.GetRequiredSection(LucidOpenApiOptions.ConfigurationSectionName));
 builder.Services.AddLucidCors(
     builder.Configuration.GetRequiredSection(LucidCorsOptions.ConfigurationSectionName));
-builder.Services.AddAuthorization();
+builder.Services.AddLucidPermissionAuthorization();
 builder.Services.AddNotificationApplication();
 builder.Services.AddNotificationInfrastructure(builder.Configuration);
 

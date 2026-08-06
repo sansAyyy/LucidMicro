@@ -6,6 +6,7 @@ using LucidMicro.Contracts.Notification.Http.Requests;
 using LucidMicro.Services.Identity.Application.ExternalServices.Notifications;
 using LucidMicro.Services.Identity.Application.DependencyInjection;
 using LucidMicro.Services.Identity.Application.Features.SmsLogin.Abstractions;
+using LucidMicro.Services.Identity.Application.Features.AdminAuth.Abstractions;
 using LucidMicro.Services.Identity.Application.Features.SmsLogin.Dtos.Requests;
 using LucidMicro.Services.Identity.Application.Features.SmsLogin.Options;
 using LucidMicro.Services.Identity.Application.Features.SmsLogin.Services;
@@ -290,6 +291,7 @@ public sealed class SmsLoginApplicationServiceTests
         services.AddScoped<ISmsLoginCodeGenerator, TestSmsLoginCodeGenerator>();
         services.AddScoped<INotificationClient, TestNotificationClient>();
         services.AddScoped<IRepository<AdminUser, Guid>>(_ => new InMemoryAdminUserRepository(adminUsers));
+        services.AddScoped<IReadOnlyAdminUserPermissionRepository, TestAdminUserPermissionRepository>();
         services.AddScoped<IUnitOfWork, TestUnitOfWork>();
         services.AddScoped<TestUnitOfWork>(serviceProvider => (TestUnitOfWork)serviceProvider.GetRequiredService<IUnitOfWork>());
         services.AddScoped<TestAccessTokenService>();

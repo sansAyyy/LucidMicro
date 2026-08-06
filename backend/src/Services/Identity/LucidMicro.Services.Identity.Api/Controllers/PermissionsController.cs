@@ -1,4 +1,6 @@
 using LucidMicro.BuildingBlocks.AspNetCore.Results;
+using LucidMicro.BuildingBlocks.Auth.AspNetCore.Authorization;
+using LucidMicro.Services.Identity.Application.Authorization;
 using LucidMicro.Services.Identity.Application.Features.Permissions.Abstractions;
 using LucidMicro.Services.Identity.Application.Features.Permissions.Dtos.Responses;
 using Microsoft.AspNetCore.Authorization;
@@ -19,6 +21,7 @@ public sealed class PermissionsController : ControllerBase
     }
 
     [HttpGet]
+    [RequirePermission(IdentityPermissions.RolesRead)]
     public async Task<ActionResult<IReadOnlyList<PermissionResponse>>> GetList(
         CancellationToken cancellationToken)
     {

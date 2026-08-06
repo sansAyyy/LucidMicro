@@ -104,6 +104,18 @@ public sealed class NotificationsHttpContractTests
     }
 
     [Fact]
+    public async Task GetList_ReturnsForbidden_WhenPermissionIsMissing()
+    {
+        await using var factory = new TestApiFactory();
+        var client = factory.CreateClient();
+        AddAdminToken(client, includeReadPermission: false);
+
+        var response = await client.GetAsync("/api/notifications?pageNumber=1&pageSize=1");
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    [Fact]
     public async Task InternalCreate_ReturnsCreatedNotificationContract()
     {
         await using var factory = new TestApiFactory();
@@ -233,7 +245,7 @@ public sealed class NotificationsHttpContractTests
         return JsonDocument.Parse(content);
     }
 
-    private static string CreateAdminToken()
+    private static string CreateAdminToken(bool includeReadPermission = true)
     {
         var signingKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes("change-me-to-a-secure-32-byte-minimum-signing-key"));
@@ -241,11 +253,7 @@ public sealed class NotificationsHttpContractTests
         var token = new JwtSecurityToken(
             issuer: "LucidMicro.Identity",
             audience: "LucidMicro.Admin",
-            claims:
-            [
-                new Claim(JwtRegisteredClaimNames.Sub, "admin-id"),
-                new Claim(JwtRegisteredClaimNames.UniqueName, "admin")
-            ],
+            claims: CreateAdminClaims(includeReadPermission),
             notBefore: DateTime.UtcNow.AddMinutes(-1),
             expires: DateTime.UtcNow.AddMinutes(30),
             signingCredentials: credentials);
@@ -253,10 +261,28 @@ public sealed class NotificationsHttpContractTests
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    private static void AddAdminToken(HttpClient client)
+    private static void AddAdminToken(HttpClient client, bool includeReadPermission = true)
     {
         client.DefaultRequestHeaders.Authorization =
-            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", CreateAdminToken());
+            new System.Net.Http.Headers.AuthenticationHeaderValue(
+                "Bearer",
+                CreateAdminToken(includeReadPermission));
+    }
+
+    private static Claim[] CreateAdminClaims(bool includeReadPermission)
+    {
+        var claims = new List<Claim>
+        {
+            new Claim(JwtRegisteredClaimNames.Sub, "admin-id"),
+            new Claim(JwtRegisteredClaimNames.UniqueName, "admin")
+        };
+
+        if (includeReadPermission)
+        {
+            claims.Add(new Claim("permission", "notification.notifications.read"));
+        }
+
+        return claims.ToArray();
     }
 
     private sealed class TestApiFactory : WebApplicationFactory<NotificationsController>

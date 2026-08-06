@@ -103,7 +103,10 @@ public sealed class RolesHttpContractTests
             claims:
             [
                 new Claim(JwtRegisteredClaimNames.Sub, "admin-id"),
-                new Claim(JwtRegisteredClaimNames.UniqueName, "admin")
+                new Claim(JwtRegisteredClaimNames.UniqueName, "admin"),
+                new Claim("permission", "identity.roles.read"),
+                new Claim("permission", "identity.roles.manage"),
+                new Claim("permission", "identity.roles.assign-permissions")
             ],
             notBefore: DateTime.UtcNow.AddMinutes(-1),
             expires: DateTime.UtcNow.AddMinutes(30),

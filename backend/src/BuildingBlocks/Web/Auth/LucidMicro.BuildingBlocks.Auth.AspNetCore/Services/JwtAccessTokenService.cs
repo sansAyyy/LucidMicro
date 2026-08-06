@@ -106,20 +106,29 @@ public sealed class JwtAccessTokenService : IAccessTokenService, IRefreshTokenSe
             tokenClaims.Add(new Claim(ClaimTypes.Name, claims.Name));
         }
 
-        if (claims.AdditionalClaims is null)
+        if (claims.AdditionalClaims is not null)
         {
-            return tokenClaims;
+            foreach (var (type, value) in claims.AdditionalClaims)
+            {
+                if (string.IsNullOrWhiteSpace(type)
+                    || string.IsNullOrWhiteSpace(value))
+                {
+                    continue;
+                }
+
+                tokenClaims.Add(new Claim(type, value));
+            }
         }
 
-        foreach (var (type, value) in claims.AdditionalClaims)
+        foreach (var claim in claims.AdditionalClaimValues)
         {
-            if (string.IsNullOrWhiteSpace(type)
-                || string.IsNullOrWhiteSpace(value))
+            if (string.IsNullOrWhiteSpace(claim.Type)
+                || string.IsNullOrWhiteSpace(claim.Value))
             {
                 continue;
             }
 
-            tokenClaims.Add(new Claim(type, value));
+            tokenClaims.Add(new Claim(claim.Type, claim.Value));
         }
 
         return tokenClaims;

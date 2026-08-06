@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 using LucidMicro.BuildingBlocks.Auth.Abstractions.Models;
 using LucidMicro.BuildingBlocks.Auth.AspNetCore.Options;
 using LucidMicro.BuildingBlocks.Auth.AspNetCore.Services;
@@ -41,6 +42,51 @@ public sealed class JwtAccessTokenServiceTests
         Assert.Equal("admin-id", jwt.Claims.Single(claim => claim.Type == JwtRegisteredClaimNames.Sub).Value);
         Assert.Equal("admin", jwt.Claims.Single(claim => claim.Type == ClaimTypes.Name).Value);
         Assert.Equal("admin@example.com", jwt.Claims.Single(claim => claim.Type == "email").Value);
+    }
+
+    [Fact]
+    public void GenerateAccessToken_WritesRepeatedPermissionClaims()
+    {
+        var service = CreateJwtAccessTokenService(
+            new DateTimeOffset(2026, 5, 24, 12, 0, 0, TimeSpan.Zero));
+        var claims = new AccessTokenClaims("admin-id")
+        {
+            AdditionalClaimValues =
+            [
+                new AccessTokenClaim(LucidClaimTypes.Permission, "identity.admin-users.read"),
+                new AccessTokenClaim(LucidClaimTypes.Permission, "identity.roles.read")
+            ]
+        };
+
+        var accessToken = service.GenerateAccessToken(claims);
+        var jwt = new JwtSecurityTokenHandler().ReadJwtToken(accessToken.Token);
+
+        Assert.Equal(
+            ["identity.admin-users.read", "identity.roles.read"],
+            jwt.Claims
+                .Where(claim => claim.Type == LucidClaimTypes.Permission)
+                .Select(claim => claim.Value));
+    }
+
+    [Fact]
+    public void GenerateAccessToken_StaysWithinFourKilobyteBudget_ForFiftyPermissions()
+    {
+        var service = CreateJwtAccessTokenService(
+            new DateTimeOffset(2026, 5, 24, 12, 0, 0, TimeSpan.Zero));
+        var claims = new AccessTokenClaims("admin-id", "admin")
+        {
+            AdditionalClaimValues = Enumerable.Range(1, 50)
+                .Select(index => new AccessTokenClaim(
+                    LucidClaimTypes.Permission,
+                    $"service.resource-{index:D3}.manage"))
+                .ToArray()
+        };
+
+        var accessToken = service.GenerateAccessToken(claims);
+
+        Assert.True(
+            Encoding.UTF8.GetByteCount(accessToken.Token) <= 4 * 1024,
+            $"Access token size was {Encoding.UTF8.GetByteCount(accessToken.Token)} bytes.");
     }
 
     [Fact]

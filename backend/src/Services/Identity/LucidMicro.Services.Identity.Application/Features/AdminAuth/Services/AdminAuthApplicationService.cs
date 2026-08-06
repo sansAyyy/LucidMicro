@@ -16,6 +16,7 @@ namespace LucidMicro.Services.Identity.Application.Features.AdminAuth.Services;
 public sealed class AdminAuthApplicationService : IAdminAuthApplicationService
 {
     private readonly IAccessTokenService _accessTokenService;
+    private readonly IAdminAccessTokenClaimsFactory _accessTokenClaimsFactory;
     private readonly IReadOnlyAdminUserPermissionRepository _adminUserPermissionRepository;
     private readonly IRepository<AdminUser, Guid> _adminUsers;
     private readonly ICurrentUser _currentUser;
@@ -31,6 +32,7 @@ public sealed class AdminAuthApplicationService : IAdminAuthApplicationService
     public AdminAuthApplicationService(
         IRepository<AdminUser, Guid> adminUsers,
         IReadOnlyAdminUserPermissionRepository adminUserPermissionRepository,
+        IAdminAccessTokenClaimsFactory accessTokenClaimsFactory,
         IUnitOfWork unitOfWork,
         IPasswordHashingService passwordHashingService,
         IAccessTokenService accessTokenService,
@@ -44,6 +46,7 @@ public sealed class AdminAuthApplicationService : IAdminAuthApplicationService
     {
         _adminUsers = adminUsers;
         _adminUserPermissionRepository = adminUserPermissionRepository;
+        _accessTokenClaimsFactory = accessTokenClaimsFactory;
         _unitOfWork = unitOfWork;
         _passwordHashingService = passwordHashingService;
         _accessTokenService = accessTokenService;
@@ -101,7 +104,8 @@ public sealed class AdminAuthApplicationService : IAdminAuthApplicationService
         adminUser.MarkLogin(_timeProvider.GetUtcNow().UtcDateTime);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return Result<LoginAdminUserResponse>.Success(CreateLoginResponse(adminUser));
+        return Result<LoginAdminUserResponse>.Success(
+            await CreateLoginResponseAsync(adminUser, cancellationToken));
     }
 
     public async Task<Result<LoginAdminUserResponse>> RefreshAsync(
@@ -135,7 +139,8 @@ public sealed class AdminAuthApplicationService : IAdminAuthApplicationService
             return Result<LoginAdminUserResponse>.Failure(AdminAuthErrors.Disabled());
         }
 
-        return Result<LoginAdminUserResponse>.Success(CreateLoginResponse(adminUser));
+        return Result<LoginAdminUserResponse>.Success(
+            await CreateLoginResponseAsync(adminUser, cancellationToken));
     }
 
     public async Task<Result<CurrentAdminUserResponse>> GetCurrentAsync(
@@ -212,15 +217,11 @@ public sealed class AdminAuthApplicationService : IAdminAuthApplicationService
         return Result<AdminUser>.Success(adminUser);
     }
 
-    private LoginAdminUserResponse CreateLoginResponse(AdminUser adminUser)
+    private async Task<LoginAdminUserResponse> CreateLoginResponseAsync(
+        AdminUser adminUser,
+        CancellationToken cancellationToken)
     {
-        var tokenClaims = new AccessTokenClaims(
-            adminUser.Id.ToString(),
-            adminUser.UserName,
-            new Dictionary<string, string>
-            {
-                ["email"] = adminUser.Email
-            });
+        var tokenClaims = await _accessTokenClaimsFactory.CreateAsync(adminUser, cancellationToken);
         var accessToken = _accessTokenService.GenerateAccessToken(tokenClaims);
         var refreshToken = _refreshTokenService.GenerateRefreshToken(tokenClaims);
 

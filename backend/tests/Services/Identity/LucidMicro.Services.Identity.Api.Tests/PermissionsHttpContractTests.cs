@@ -69,7 +69,8 @@ public sealed class PermissionsHttpContractTests
             claims:
             [
                 new Claim(JwtRegisteredClaimNames.Sub, "admin-id"),
-                new Claim(JwtRegisteredClaimNames.UniqueName, "admin")
+                new Claim(JwtRegisteredClaimNames.UniqueName, "admin"),
+                new Claim("permission", "identity.roles.read")
             ],
             notBefore: DateTime.UtcNow.AddMinutes(-1),
             expires: DateTime.UtcNow.AddMinutes(30),

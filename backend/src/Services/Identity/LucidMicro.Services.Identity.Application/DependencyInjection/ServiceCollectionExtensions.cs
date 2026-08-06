@@ -22,6 +22,7 @@ public static class ServiceCollectionExtensions
 
         services.TryAddSingleton(TimeProvider.System);
         services.AddScoped<IAdminAuthApplicationService, AdminAuthApplicationService>();
+        services.AddScoped<IAdminAccessTokenClaimsFactory, AdminAccessTokenClaimsFactory>();
         services.AddScoped<IAdminUserApplicationService, AdminUserApplicationService>();
         services.AddScoped<IPermissionApplicationService, PermissionApplicationService>();
         services.AddScoped<IRoleApplicationService, RoleApplicationService>();
